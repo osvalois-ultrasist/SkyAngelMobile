@@ -49,9 +49,9 @@ class CognitoAuthDataSourceImpl implements CognitoAuthDataSource {
       final session = await cognitoUser.authenticateUser(authDetails);
       
       if (session == null) {
-        throw const AppError(
+        throw AppError.authentication(
           message: 'Authentication failed',
-          code: 'AUTH_FAILED',
+          details: 'No session returned from Cognito',
         );
       }
 
@@ -65,14 +65,14 @@ class CognitoAuthDataSourceImpl implements CognitoAuthDataSource {
         ),
       );
     } on CognitoUserException catch (e) {
-      throw AppError(
+      throw AppError.authentication(
         message: e.message ?? 'Authentication failed',
-        code: e.code ?? 'AUTH_ERROR',
+        details: 'Cognito authentication error: ${e.message ?? 'AUTH_ERROR'}',
       );
     } catch (e) {
-      throw AppError(
-        message: e.toString(),
-        code: 'UNKNOWN_ERROR',
+      throw AppError.unknown(
+        message: 'Authentication failed',
+        details: e.toString(),
       );
     }
   }
@@ -98,22 +98,22 @@ class CognitoAuthDataSourceImpl implements CognitoAuthDataSource {
       );
 
       if (result.userSub == null) {
-        throw const AppError(
+        throw AppError.validation(
           message: 'Registration failed',
-          code: 'SIGNUP_FAILED',
+          details: 'User sub ID is null',
         );
       }
 
       return result.user;
     } on CognitoUserException catch (e) {
-      throw AppError(
+      throw AppError.validation(
         message: e.message ?? 'Registration failed',
-        code: e.code ?? 'SIGNUP_ERROR',
+        details: 'Cognito signup error: ${e.message ?? 'SIGNUP_ERROR'}',
       );
     } catch (e) {
-      throw AppError(
-        message: e.toString(),
-        code: 'UNKNOWN_ERROR',
+      throw AppError.unknown(
+        message: 'Registration failed',
+        details: e.toString(),
       );
     }
   }
@@ -125,14 +125,14 @@ class CognitoAuthDataSourceImpl implements CognitoAuthDataSource {
       final result = await cognitoUser.confirmRegistration(code);
       return result;
     } on CognitoUserException catch (e) {
-      throw AppError(
+      throw AppError.validation(
         message: e.message ?? 'Confirmation failed',
-        code: e.code ?? 'CONFIRM_ERROR',
+        details: 'Cognito confirmation error: ${e.message ?? 'CONFIRM_ERROR'}',
       );
     } catch (e) {
-      throw AppError(
-        message: e.toString(),
-        code: 'UNKNOWN_ERROR',
+      throw AppError.unknown(
+        message: 'Confirmation failed',
+        details: e.toString(),
       );
     }
   }
@@ -143,14 +143,14 @@ class CognitoAuthDataSourceImpl implements CognitoAuthDataSource {
       final cognitoUser = CognitoUser(username, _userPool);
       await cognitoUser.forgotPassword();
     } on CognitoUserException catch (e) {
-      throw AppError(
+      throw AppError.server(
         message: e.message ?? 'Failed to send reset code',
-        code: e.code ?? 'FORGOT_PASSWORD_ERROR',
+        details: 'Cognito forgot password error: ${e.message ?? 'FORGOT_PASSWORD_ERROR'}',
       );
     } catch (e) {
-      throw AppError(
-        message: e.toString(),
-        code: 'UNKNOWN_ERROR',
+      throw AppError.unknown(
+        message: 'Failed to send reset code',
+        details: e.toString(),
       );
     }
   }
@@ -165,20 +165,20 @@ class CognitoAuthDataSourceImpl implements CognitoAuthDataSource {
       final cognitoUser = CognitoUser(username, _userPool);
       final result = await cognitoUser.confirmPassword(code, newPassword);
       if (!result) {
-        throw const AppError(
+        throw AppError.validation(
           message: 'Failed to reset password',
-          code: 'CONFIRM_PASSWORD_FAILED',
+          details: 'Password confirmation returned false',
         );
       }
     } on CognitoUserException catch (e) {
-      throw AppError(
+      throw AppError.validation(
         message: e.message ?? 'Failed to reset password',
-        code: e.code ?? 'CONFIRM_PASSWORD_ERROR',
+        details: 'Cognito confirm password error: ${e.message ?? 'CONFIRM_PASSWORD_ERROR'}',
       );
     } catch (e) {
-      throw AppError(
-        message: e.toString(),
-        code: 'UNKNOWN_ERROR',
+      throw AppError.unknown(
+        message: 'Failed to reset password',
+        details: e.toString(),
       );
     }
   }
@@ -188,17 +188,17 @@ class CognitoAuthDataSourceImpl implements CognitoAuthDataSource {
     try {
       final cognitoUser = await _userPool.getCurrentUser();
       if (cognitoUser == null) {
-        throw const AppError(
+        throw AppError.authentication(
           message: 'No current user',
-          code: 'NO_USER',
+          details: 'No authenticated user found in Cognito',
         );
       }
 
       final session = await cognitoUser.getSession();
       if (session == null) {
-        throw const AppError(
+        throw AppError.authentication(
           message: 'Failed to refresh token',
-          code: 'REFRESH_FAILED',
+          details: 'No session returned from Cognito',
         );
       }
 
@@ -212,14 +212,14 @@ class CognitoAuthDataSourceImpl implements CognitoAuthDataSource {
         ),
       );
     } on CognitoUserException catch (e) {
-      throw AppError(
+      throw AppError.authentication(
         message: e.message ?? 'Failed to refresh token',
-        code: e.code ?? 'REFRESH_ERROR',
+        details: 'Cognito refresh token error: ${e.message ?? 'REFRESH_ERROR'}',
       );
     } catch (e) {
-      throw AppError(
-        message: e.toString(),
-        code: 'UNKNOWN_ERROR',
+      throw AppError.unknown(
+        message: 'Failed to refresh token',
+        details: e.toString(),
       );
     }
   }
@@ -229,17 +229,17 @@ class CognitoAuthDataSourceImpl implements CognitoAuthDataSource {
     try {
       final cognitoUser = await _userPool.getCurrentUser();
       if (cognitoUser == null) {
-        throw const AppError(
+        throw AppError.authentication(
           message: 'No current user',
-          code: 'NO_USER',
+          details: 'No authenticated user found in Cognito',
         );
       }
 
       final attributes = await cognitoUser.getUserAttributes();
       if (attributes == null) {
-        throw const AppError(
+        throw AppError.server(
           message: 'Failed to get user attributes',
-          code: 'NO_ATTRIBUTES',
+          details: 'Cognito returned null attributes',
         );
       }
 
@@ -249,7 +249,7 @@ class CognitoAuthDataSourceImpl implements CognitoAuthDataSource {
       }
 
       return UserModel(
-        id: attributeMap['sub'] ?? '',
+        cognitoId: attributeMap['sub'] ?? '',
         email: attributeMap['email'] ?? '',
         name: attributeMap['name'] ?? '',
         familyName: attributeMap['family_name'] ?? '',
@@ -258,14 +258,14 @@ class CognitoAuthDataSourceImpl implements CognitoAuthDataSource {
         emailVerified: attributeMap['email_verified'] == 'true',
       );
     } on CognitoUserException catch (e) {
-      throw AppError(
+      throw AppError.authentication(
         message: e.message ?? 'Failed to get current user',
-        code: e.code ?? 'GET_USER_ERROR',
+        details: 'Cognito get user error: ${e.message ?? 'GET_USER_ERROR'}',
       );
     } catch (e) {
-      throw AppError(
-        message: e.toString(),
-        code: 'UNKNOWN_ERROR',
+      throw AppError.unknown(
+        message: 'Failed to get current user',
+        details: e.toString(),
       );
     }
   }
@@ -278,9 +278,9 @@ class CognitoAuthDataSourceImpl implements CognitoAuthDataSource {
         await cognitoUser.signOut();
       }
     } catch (e) {
-      throw AppError(
-        message: e.toString(),
-        code: 'SIGNOUT_ERROR',
+      throw AppError.unknown(
+        message: 'Failed to sign out',
+        details: e.toString(),
       );
     }
   }

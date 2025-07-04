@@ -44,40 +44,40 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDGQ7fJ9X6K5L8N9P0R1S2T3U4V5W6X7Y8Z',
-    appId: '1:123456789:web:abcdef123456789',
-    messagingSenderId: '123456789',
-    projectId: 'skyangermobile',
-    authDomain: 'skyangermobile.firebaseapp.com',
-    storageBucket: 'skyangermobile.appspot.com',
-    measurementId: 'G-XXXXXXXXXX',
+    apiKey: 'demo-api-key',
+    appId: '1:demo-project:web:demo-app-id',
+    messagingSenderId: 'demo-sender-id',
+    projectId: 'skyangel-mobile-demo',
+    authDomain: 'skyangel-mobile-demo.firebaseapp.com',
+    storageBucket: 'skyangel-mobile-demo.appspot.com',
+    measurementId: 'G-DEMO',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDGQ7fJ9X6K5L8N9P0R1S2T3U4V5W6X7Y8Z',
-    appId: '1:123456789:android:abcdef123456789',
-    messagingSenderId: '123456789',
-    projectId: 'skyangermobile',
-    storageBucket: 'skyangermobile.appspot.com',
+    apiKey: 'demo-api-key',
+    appId: '1:demo-project:android:demo-app-id',
+    messagingSenderId: 'demo-sender-id',
+    projectId: 'skyangel-mobile-demo',
+    storageBucket: 'skyangel-mobile-demo.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDGQ7fJ9X6K5L8N9P0R1S2T3U4V5W6X7Y8Z',
-    appId: '1:123456789:ios:abcdef123456789',
-    messagingSenderId: '123456789',
-    projectId: 'skyangermobile',
-    authDomain: 'skyangermobile.firebaseapp.com',
-    storageBucket: 'skyangermobile.appspot.com',
+    apiKey: 'demo-api-key',
+    appId: '1:demo-project:ios:demo-app-id',
+    messagingSenderId: 'demo-sender-id',
+    projectId: 'skyangel-mobile-demo',
+    authDomain: 'skyangel-mobile-demo.firebaseapp.com',
+    storageBucket: 'skyangel-mobile-demo.appspot.com',
     iosBundleId: 'com.skyangel.mobile',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDGQ7fJ9X6K5L8N9P0R1S2T3U4V5W6X7Y8Z',
-    appId: '1:123456789:macos:abcdef123456789',
-    messagingSenderId: '123456789',
-    projectId: 'skyangermobile',
-    authDomain: 'skyangermobile.firebaseapp.com',
-    storageBucket: 'skyangermobile.appspot.com',
+    apiKey: 'demo-api-key',
+    appId: '1:demo-project:macos:demo-app-id',
+    messagingSenderId: 'demo-sender-id',
+    projectId: 'skyangel-mobile-demo',
+    authDomain: 'skyangel-mobile-demo.firebaseapp.com',
+    storageBucket: 'skyangel-mobile-demo.appspot.com',
     iosBundleId: 'com.skyangel.mobile',
   );
 }

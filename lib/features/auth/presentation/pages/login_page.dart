@@ -3,6 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../providers/auth_provider.dart';
+import '../providers/auth_state.dart';
 import '../utils/auth_validators.dart';
 import '../widgets/auth_button.dart';
 import '../widgets/auth_text_field.dart';

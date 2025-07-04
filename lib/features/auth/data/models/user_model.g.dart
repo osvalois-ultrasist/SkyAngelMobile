@@ -7,10 +7,18 @@ part of 'user_model.dart';
 // **************************************************************************
 
 UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
-      id: json['sub'] as String,
+      cognitoId: json['sub'] as String?,
+      id: (json['id'] as num?)?.toInt(),
+      usuario: json['usuario'] as String?,
+      nombre: json['nombre'] as String?,
+      rol: json['rol'] as String?,
+      activo: json['activo'] as bool?,
+      fechaCreacion: json['fecha_creacion'] as String?,
+      ultimoAcceso: json['ultimo_acceso'] as String?,
+      sessionId: json['session_id'] as String?,
       email: json['email'] as String,
-      name: json['name'] as String,
-      familyName: json['family_name'] as String,
+      name: json['name'] as String?,
+      familyName: json['family_name'] as String?,
       username: json['username'] as String?,
       phoneNumber: json['phone_number'] as String?,
       emailVerified: json['email_verified'] as bool?,
@@ -19,7 +27,15 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
     );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
-      'sub': instance.id,
+      'sub': instance.cognitoId,
+      'id': instance.id,
+      'usuario': instance.usuario,
+      'nombre': instance.nombre,
+      'rol': instance.rol,
+      'activo': instance.activo,
+      'fecha_creacion': instance.fechaCreacion,
+      'ultimo_acceso': instance.ultimoAcceso,
+      'session_id': instance.sessionId,
       'email': instance.email,
       'name': instance.name,
       'family_name': instance.familyName,

@@ -16,7 +16,8 @@ import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  await _initializeApp();
+  // Inicialización básica y crítica solamente
+  await _initializeCriticalServices();
   
   runApp(
     const ProviderScope(
@@ -25,20 +26,12 @@ void main() async {
   );
 }
 
-Future<void> _initializeApp() async {
+/// Inicialización crítica que debe completarse antes de mostrar la UI
+Future<void> _initializeCriticalServices() async {
   try {
-    // Initialize Firebase
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    AppLogger.info('Initializing critical services...');
     
-    // Initialize Hive
-    await Hive.initFlutter();
-    
-    // Initialize dependency injection
-    await configureDependencies();
-    
-    // Set system UI overlay style
+    // Set system UI overlay style first
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -54,6 +47,37 @@ Future<void> _initializeApp() async {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+    
+    // Initialize critical dependencies needed for app startup
+    await configureDependencies();
+    AppLogger.info('Critical dependencies initialized');
+    
+    AppLogger.info('Critical services initialized successfully');
+  } catch (e, stackTrace) {
+    AppLogger.error('Error initializing critical services', error: e, stackTrace: stackTrace);
+    // No rethrow aquí para evitar que la app no arranque
+  }
+}
+
+/// Inicialización completa que se ejecuta en el splash screen
+Future<void> initializeApp() async {
+  try {
+    AppLogger.info('Starting full app initialization...');
+    
+    // Initialize Firebase (with fallback)
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      AppLogger.info('Firebase initialized successfully');
+    } catch (e) {
+      AppLogger.warning('Firebase initialization failed, continuing without Firebase: $e');
+      // Continue without Firebase - the app can still work
+    }
+    
+    // Initialize Hive
+    await Hive.initFlutter();
+    AppLogger.info('Hive initialized');
     
     // Print environment configuration
     EnvironmentConfig.printConfiguration();

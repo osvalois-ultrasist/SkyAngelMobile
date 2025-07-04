@@ -17,9 +17,10 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$AuthTokens {
   String get accessToken => throw _privateConstructorUsedError;
-  String get idToken => throw _privateConstructorUsedError;
   String get refreshToken => throw _privateConstructorUsedError;
   int get expiresIn => throw _privateConstructorUsedError;
+  String get tokenType => throw _privateConstructorUsedError;
+  String? get idToken => throw _privateConstructorUsedError;
   DateTime? get expiresAt => throw _privateConstructorUsedError;
 
   /// Create a copy of AuthTokens
@@ -37,9 +38,10 @@ abstract class $AuthTokensCopyWith<$Res> {
   @useResult
   $Res call(
       {String accessToken,
-      String idToken,
       String refreshToken,
       int expiresIn,
+      String tokenType,
+      String? idToken,
       DateTime? expiresAt});
 }
 
@@ -59,19 +61,16 @@ class _$AuthTokensCopyWithImpl<$Res, $Val extends AuthTokens>
   @override
   $Res call({
     Object? accessToken = null,
-    Object? idToken = null,
     Object? refreshToken = null,
     Object? expiresIn = null,
+    Object? tokenType = null,
+    Object? idToken = freezed,
     Object? expiresAt = freezed,
   }) {
     return _then(_value.copyWith(
       accessToken: null == accessToken
           ? _value.accessToken
           : accessToken // ignore: cast_nullable_to_non_nullable
-              as String,
-      idToken: null == idToken
-          ? _value.idToken
-          : idToken // ignore: cast_nullable_to_non_nullable
               as String,
       refreshToken: null == refreshToken
           ? _value.refreshToken
@@ -81,6 +80,14 @@ class _$AuthTokensCopyWithImpl<$Res, $Val extends AuthTokens>
           ? _value.expiresIn
           : expiresIn // ignore: cast_nullable_to_non_nullable
               as int,
+      tokenType: null == tokenType
+          ? _value.tokenType
+          : tokenType // ignore: cast_nullable_to_non_nullable
+              as String,
+      idToken: freezed == idToken
+          ? _value.idToken
+          : idToken // ignore: cast_nullable_to_non_nullable
+              as String?,
       expiresAt: freezed == expiresAt
           ? _value.expiresAt
           : expiresAt // ignore: cast_nullable_to_non_nullable
@@ -99,9 +106,10 @@ abstract class _$$AuthTokensImplCopyWith<$Res>
   @useResult
   $Res call(
       {String accessToken,
-      String idToken,
       String refreshToken,
       int expiresIn,
+      String tokenType,
+      String? idToken,
       DateTime? expiresAt});
 }
 
@@ -119,19 +127,16 @@ class __$$AuthTokensImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? accessToken = null,
-    Object? idToken = null,
     Object? refreshToken = null,
     Object? expiresIn = null,
+    Object? tokenType = null,
+    Object? idToken = freezed,
     Object? expiresAt = freezed,
   }) {
     return _then(_$AuthTokensImpl(
       accessToken: null == accessToken
           ? _value.accessToken
           : accessToken // ignore: cast_nullable_to_non_nullable
-              as String,
-      idToken: null == idToken
-          ? _value.idToken
-          : idToken // ignore: cast_nullable_to_non_nullable
               as String,
       refreshToken: null == refreshToken
           ? _value.refreshToken
@@ -141,6 +146,14 @@ class __$$AuthTokensImplCopyWithImpl<$Res>
           ? _value.expiresIn
           : expiresIn // ignore: cast_nullable_to_non_nullable
               as int,
+      tokenType: null == tokenType
+          ? _value.tokenType
+          : tokenType // ignore: cast_nullable_to_non_nullable
+              as String,
+      idToken: freezed == idToken
+          ? _value.idToken
+          : idToken // ignore: cast_nullable_to_non_nullable
+              as String?,
       expiresAt: freezed == expiresAt
           ? _value.expiresAt
           : expiresAt // ignore: cast_nullable_to_non_nullable
@@ -154,26 +167,29 @@ class __$$AuthTokensImplCopyWithImpl<$Res>
 class _$AuthTokensImpl extends _AuthTokens {
   const _$AuthTokensImpl(
       {required this.accessToken,
-      required this.idToken,
       required this.refreshToken,
       required this.expiresIn,
+      required this.tokenType,
+      this.idToken,
       this.expiresAt})
       : super._();
 
   @override
   final String accessToken;
   @override
-  final String idToken;
-  @override
   final String refreshToken;
   @override
   final int expiresIn;
+  @override
+  final String tokenType;
+  @override
+  final String? idToken;
   @override
   final DateTime? expiresAt;
 
   @override
   String toString() {
-    return 'AuthTokens(accessToken: $accessToken, idToken: $idToken, refreshToken: $refreshToken, expiresIn: $expiresIn, expiresAt: $expiresAt)';
+    return 'AuthTokens(accessToken: $accessToken, refreshToken: $refreshToken, expiresIn: $expiresIn, tokenType: $tokenType, idToken: $idToken, expiresAt: $expiresAt)';
   }
 
   @override
@@ -183,18 +199,20 @@ class _$AuthTokensImpl extends _AuthTokens {
             other is _$AuthTokensImpl &&
             (identical(other.accessToken, accessToken) ||
                 other.accessToken == accessToken) &&
-            (identical(other.idToken, idToken) || other.idToken == idToken) &&
             (identical(other.refreshToken, refreshToken) ||
                 other.refreshToken == refreshToken) &&
             (identical(other.expiresIn, expiresIn) ||
                 other.expiresIn == expiresIn) &&
+            (identical(other.tokenType, tokenType) ||
+                other.tokenType == tokenType) &&
+            (identical(other.idToken, idToken) || other.idToken == idToken) &&
             (identical(other.expiresAt, expiresAt) ||
                 other.expiresAt == expiresAt));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, accessToken, idToken, refreshToken, expiresIn, expiresAt);
+  int get hashCode => Object.hash(runtimeType, accessToken, refreshToken,
+      expiresIn, tokenType, idToken, expiresAt);
 
   /// Create a copy of AuthTokens
   /// with the given fields replaced by the non-null parameter values.
@@ -208,20 +226,23 @@ class _$AuthTokensImpl extends _AuthTokens {
 abstract class _AuthTokens extends AuthTokens {
   const factory _AuthTokens(
       {required final String accessToken,
-      required final String idToken,
       required final String refreshToken,
       required final int expiresIn,
+      required final String tokenType,
+      final String? idToken,
       final DateTime? expiresAt}) = _$AuthTokensImpl;
   const _AuthTokens._() : super._();
 
   @override
   String get accessToken;
   @override
-  String get idToken;
-  @override
   String get refreshToken;
   @override
   int get expiresIn;
+  @override
+  String get tokenType;
+  @override
+  String? get idToken;
   @override
   DateTime? get expiresAt;
 

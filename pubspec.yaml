@@ -95,7 +95,7 @@ dependencies:
 
   # Image Processing
   image_picker: ^1.0.6
-  image_cropper: ^5.0.1
+  # image_cropper: ^5.0.1  # Temporarily disabled due to compilation issues
   flutter_image_compress: ^2.1.0
 
   # Internationalization
@@ -137,19 +137,19 @@ flutter:
     - assets/geojson/
     - assets/config/
 
-  fonts:
-    - family: Roboto
-      fonts:
-        - asset: assets/fonts/Roboto-Regular.ttf
-        - asset: assets/fonts/Roboto-Bold.ttf
-          weight: 700
-    - family: Inter
-      fonts:
-        - asset: assets/fonts/Inter-Regular.ttf
-        - asset: assets/fonts/Inter-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/Inter-Bold.ttf
-          weight: 700
+  # fonts:
+  #   - family: Roboto
+  #     fonts:
+  #       - asset: assets/fonts/Roboto-Regular.ttf
+  #       - asset: assets/fonts/Roboto-Bold.ttf
+  #         weight: 700
+  #   - family: Inter
+  #     fonts:
+  #       - asset: assets/fonts/Inter-Regular.ttf
+  #       - asset: assets/fonts/Inter-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Inter-Bold.ttf
+  #         weight: 700
 
 flutter_intl:
   enabled: true

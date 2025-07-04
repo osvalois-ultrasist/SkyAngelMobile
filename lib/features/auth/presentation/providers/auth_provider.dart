@@ -45,14 +45,19 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
   Future<void> _checkAuthStatus() async {
     final accessToken = await secureStorage.read('access_token');
     if (accessToken != null && accessToken.isNotEmpty) {
-      final userResult = await authRepository.getCurrentUser();
-      userResult.fold(
-        (error) => state = state.copyWith(isAuthenticated: false),
-        (user) => state = state.copyWith(
-          isAuthenticated: true,
-          user: user,
-        ),
-      );
+      try {
+        final user = await authRepository.getCurrentUser();
+        if (user != null) {
+          state = state.copyWith(
+            isAuthenticated: true,
+            user: user,
+          );
+        } else {
+          state = state.copyWith(isAuthenticated: false);
+        }
+      } catch (e) {
+        state = state.copyWith(isAuthenticated: false);
+      }
     }
   }
 
@@ -74,20 +79,20 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         isLoading: false,
         error: error.message,
       ),
-      (tokens) async {
-        final userResult = await authRepository.getCurrentUser();
-        userResult.fold(
-          (error) => state = state.copyWith(
-            isLoading: false,
-            error: error.message,
-          ),
-          (user) => state = state.copyWith(
+      (user) async {
+        try {
+          final currentUser = await authRepository.getCurrentUser();
+          state = state.copyWith(
             isLoading: false,
             isAuthenticated: true,
-            user: user,
-            tokens: tokens,
-          ),
-        );
+            user: currentUser ?? user,
+          );
+        } catch (e) {
+          state = state.copyWith(
+            isLoading: false,
+            error: 'Error al obtener usuario actual',
+          );
+        }
       },
     );
   }
@@ -105,6 +110,7 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
       password: password,
       name: name,
       familyName: familyName,
+      username: email.split('@')[0], // Usar parte del email como username
     );
 
     final result = await signUpUseCase(request);

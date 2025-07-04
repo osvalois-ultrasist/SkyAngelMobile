@@ -39,7 +39,6 @@
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
-            android:orientation="portrait"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize">
             
@@ -72,34 +71,7 @@
             android:name="flutterEmbedding"
             android:value="2" />
             
-        <!-- Firebase Cloud Messaging -->
-        <service
-            android:name=".MyFirebaseMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-        
-        <!-- Background location service -->
-        <service
-            android:name="com.skyangel.mobile.LocationService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="location" />
-            
-        <!-- Boot receiver for background tasks -->
-        <receiver
-            android:name=".BootReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter android:priority="1000">
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-                <action android:name="android.intent.action.PACKAGE_REPLACED" />
-                <data android:scheme="package" />
-            </intent-filter>
-        </receiver>
+        <!-- Servicios y receivers pueden ser añadidos más tarde cuando sean necesarios -->
         
         <!-- File provider for sharing and camera -->
         <provider

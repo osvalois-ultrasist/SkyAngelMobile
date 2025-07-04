@@ -1,30 +1,35 @@
-import 'package:dartz/dartz.dart';
-import '../../../../core/error/app_error.dart';
 import '../entities/auth_credentials.dart';
 import '../entities/auth_tokens.dart';
 import '../entities/register_request.dart';
 import '../entities/user_entity.dart';
 
+/// Repositorio de autenticación que maneja tanto Cognito como API mock
+/// Las implementaciones lanzan AppError en caso de error
 abstract class AuthRepository {
-  Future<Either<AppError, AuthTokens>> signIn(AuthCredentials credentials);
+  /// Inicia sesión con credenciales y retorna información del usuario
+  Future<UserEntity> signIn(AuthCredentials credentials);
   
-  Future<Either<AppError, UserEntity>> signUp(RegisterRequest request);
+  /// Registra un nuevo usuario
+  Future<UserEntity> signUp(RegisterRequest request);
   
-  Future<Either<AppError, bool>> confirmUser(String username, String code);
+  /// Confirma el registro de un usuario (principalmente para Cognito)
+  Future<bool> confirmUser(String username, String code);
   
-  Future<Either<AppError, void>> forgotPassword(String username);
+  /// Solicita reset de contraseña
+  Future<void> forgotPassword(String username);
   
-  Future<Either<AppError, void>> confirmPassword(
-    String username,
-    String code,
-    String newPassword,
-  );
+  /// Confirma el reset de contraseña
+  Future<void> resetPassword(String username, String code, String newPassword);
   
-  Future<Either<AppError, AuthTokens>> refreshToken(String refreshToken);
+  /// Refresca los tokens de autenticación
+  Future<AuthTokens> refreshTokens(String refreshToken);
   
-  Future<Either<AppError, UserEntity>> getCurrentUser();
+  /// Obtiene el usuario actual autenticado
+  Future<UserEntity?> getCurrentUser();
   
-  Future<Either<AppError, void>> signOut();
+  /// Cierra sesión
+  Future<void> signOut();
   
-  Future<Either<AppError, bool>> checkEmailAuthorization(String email);
+  /// Verifica si el usuario está autenticado
+  Future<bool> isSignedIn();
 }

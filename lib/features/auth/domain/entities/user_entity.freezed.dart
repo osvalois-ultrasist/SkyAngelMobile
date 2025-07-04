@@ -24,7 +24,11 @@ mixin _$UserEntity {
   String? get phoneNumber => throw _privateConstructorUsedError;
   DateTime? get emailVerified => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
-  DateTime? get updatedAt => throw _privateConstructorUsedError;
+  DateTime? get updatedAt =>
+      throw _privateConstructorUsedError; // Campos adicionales para compatibilidad con API mock
+  String? get role => throw _privateConstructorUsedError;
+  bool? get isActive => throw _privateConstructorUsedError;
+  String? get sessionId => throw _privateConstructorUsedError;
 
   /// Create a copy of UserEntity
   /// with the given fields replaced by the non-null parameter values.
@@ -48,7 +52,10 @@ abstract class $UserEntityCopyWith<$Res> {
       String? phoneNumber,
       DateTime? emailVerified,
       DateTime? createdAt,
-      DateTime? updatedAt});
+      DateTime? updatedAt,
+      String? role,
+      bool? isActive,
+      String? sessionId});
 }
 
 /// @nodoc
@@ -75,6 +82,9 @@ class _$UserEntityCopyWithImpl<$Res, $Val extends UserEntity>
     Object? emailVerified = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? role = freezed,
+    Object? isActive = freezed,
+    Object? sessionId = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -113,6 +123,18 @@ class _$UserEntityCopyWithImpl<$Res, $Val extends UserEntity>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      role: freezed == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isActive: freezed == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      sessionId: freezed == sessionId
+          ? _value.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -134,7 +156,10 @@ abstract class _$$UserEntityImplCopyWith<$Res>
       String? phoneNumber,
       DateTime? emailVerified,
       DateTime? createdAt,
-      DateTime? updatedAt});
+      DateTime? updatedAt,
+      String? role,
+      bool? isActive,
+      String? sessionId});
 }
 
 /// @nodoc
@@ -159,6 +184,9 @@ class __$$UserEntityImplCopyWithImpl<$Res>
     Object? emailVerified = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? role = freezed,
+    Object? isActive = freezed,
+    Object? sessionId = freezed,
   }) {
     return _then(_$UserEntityImpl(
       id: null == id
@@ -197,6 +225,18 @@ class __$$UserEntityImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      role: freezed == role
+          ? _value.role
+          : role // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isActive: freezed == isActive
+          ? _value.isActive
+          : isActive // ignore: cast_nullable_to_non_nullable
+              as bool?,
+      sessionId: freezed == sessionId
+          ? _value.sessionId
+          : sessionId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -213,7 +253,10 @@ class _$UserEntityImpl extends _UserEntity {
       this.phoneNumber,
       this.emailVerified,
       this.createdAt,
-      this.updatedAt})
+      this.updatedAt,
+      this.role,
+      this.isActive,
+      this.sessionId})
       : super._();
 
   @override
@@ -234,10 +277,17 @@ class _$UserEntityImpl extends _UserEntity {
   final DateTime? createdAt;
   @override
   final DateTime? updatedAt;
+// Campos adicionales para compatibilidad con API mock
+  @override
+  final String? role;
+  @override
+  final bool? isActive;
+  @override
+  final String? sessionId;
 
   @override
   String toString() {
-    return 'UserEntity(id: $id, email: $email, name: $name, familyName: $familyName, username: $username, phoneNumber: $phoneNumber, emailVerified: $emailVerified, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'UserEntity(id: $id, email: $email, name: $name, familyName: $familyName, username: $username, phoneNumber: $phoneNumber, emailVerified: $emailVerified, createdAt: $createdAt, updatedAt: $updatedAt, role: $role, isActive: $isActive, sessionId: $sessionId)';
   }
 
   @override
@@ -259,12 +309,29 @@ class _$UserEntityImpl extends _UserEntity {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            (identical(other.role, role) || other.role == role) &&
+            (identical(other.isActive, isActive) ||
+                other.isActive == isActive) &&
+            (identical(other.sessionId, sessionId) ||
+                other.sessionId == sessionId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, email, name, familyName,
-      username, phoneNumber, emailVerified, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      email,
+      name,
+      familyName,
+      username,
+      phoneNumber,
+      emailVerified,
+      createdAt,
+      updatedAt,
+      role,
+      isActive,
+      sessionId);
 
   /// Create a copy of UserEntity
   /// with the given fields replaced by the non-null parameter values.
@@ -285,7 +352,10 @@ abstract class _UserEntity extends UserEntity {
       final String? phoneNumber,
       final DateTime? emailVerified,
       final DateTime? createdAt,
-      final DateTime? updatedAt}) = _$UserEntityImpl;
+      final DateTime? updatedAt,
+      final String? role,
+      final bool? isActive,
+      final String? sessionId}) = _$UserEntityImpl;
   const _UserEntity._() : super._();
 
   @override
@@ -305,7 +375,14 @@ abstract class _UserEntity extends UserEntity {
   @override
   DateTime? get createdAt;
   @override
-  DateTime? get updatedAt;
+  DateTime?
+      get updatedAt; // Campos adicionales para compatibilidad con API mock
+  @override
+  String? get role;
+  @override
+  bool? get isActive;
+  @override
+  String? get sessionId;
 
   /// Create a copy of UserEntity
   /// with the given fields replaced by the non-null parameter values.

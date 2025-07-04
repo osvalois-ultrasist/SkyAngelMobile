@@ -11,7 +11,17 @@ class SignUpUseCase {
 
   SignUpUseCase(this._repository);
 
-  Future<Either<AppError, UserEntity>> call(RegisterRequest request) {
-    return _repository.signUp(request);
+  Future<Either<AppError, UserEntity>> call(RegisterRequest request) async {
+    try {
+      final user = await _repository.signUp(request);
+      return Right(user);
+    } on AppError catch (e) {
+      return Left(e);
+    } catch (e) {
+      return Left(AppError.unknown(
+        message: 'Error durante el registro',
+        details: e.toString(),
+      ));
+    }
   }
 }

@@ -6,9 +6,10 @@ part 'auth_tokens.freezed.dart';
 class AuthTokens with _$AuthTokens {
   const factory AuthTokens({
     required String accessToken,
-    required String idToken,
     required String refreshToken,
     required int expiresIn,
+    required String tokenType,
+    String? idToken,
     DateTime? expiresAt,
   }) = _AuthTokens;
 

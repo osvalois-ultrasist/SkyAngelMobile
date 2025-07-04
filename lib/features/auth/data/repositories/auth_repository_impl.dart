@@ -10,7 +10,7 @@ import '../../domain/repositories/auth_repository.dart';
 import '../datasources/cognito_auth_datasource.dart';
 import '../datasources/email_validation_datasource.dart';
 
-@LazySingleton(as: AuthRepository)
+// @LazySingleton(as: AuthRepository) // Desactivado en favor de HybridAuthRepositoryImpl
 class AuthRepositoryImpl implements AuthRepository {
   final CognitoAuthDataSource _cognitoDataSource;
   final EmailValidationDataSource _emailValidationDataSource;
@@ -34,10 +34,10 @@ class AuthRepositoryImpl implements AuthRepository {
 
       final tokens = response.toAuthTokens();
       if (tokens == null) {
-        return const Left(
-          AppError(
+        return Left(
+          AppError.unknown(
             message: 'Failed to parse authentication response',
-            code: 'PARSE_ERROR',
+            details: 'Unable to convert Cognito response to AuthTokens',
           ),
         );
       }
@@ -48,9 +48,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(e);
     } catch (e) {
       return Left(
-        AppError(
-          message: e.toString(),
-          code: 'SIGNIN_ERROR',
+        AppError.unknown(
+          message: 'Sign in failed',
+          details: e.toString(),
         ),
       );
     }
@@ -67,10 +67,10 @@ class AuthRepositoryImpl implements AuthRepository {
         (error) => Left(error),
         (authorized) async {
           if (!authorized) {
-            return const Left(
-              AppError(
+            return Left(
+              AppError.authorization(
                 message: 'Usuario no autorizado',
-                code: 'EMAIL_NOT_AUTHORIZED',
+                details: 'El correo electrónico no está autorizado para usar la aplicación',
               ),
             );
           }
@@ -99,9 +99,9 @@ class AuthRepositoryImpl implements AuthRepository {
       );
     } catch (e) {
       return Left(
-        AppError(
-          message: e.toString(),
-          code: 'SIGNUP_ERROR',
+        AppError.unknown(
+          message: 'Registration failed',
+          details: e.toString(),
         ),
       );
     }
@@ -119,9 +119,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(e);
     } catch (e) {
       return Left(
-        AppError(
-          message: e.toString(),
-          code: 'CONFIRM_ERROR',
+        AppError.unknown(
+          message: 'User confirmation failed',
+          details: e.toString(),
         ),
       );
     }
@@ -136,9 +136,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(e);
     } catch (e) {
       return Left(
-        AppError(
-          message: e.toString(),
-          code: 'FORGOT_PASSWORD_ERROR',
+        AppError.unknown(
+          message: 'Password reset failed',
+          details: e.toString(),
         ),
       );
     }
@@ -157,9 +157,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(e);
     } catch (e) {
       return Left(
-        AppError(
-          message: e.toString(),
-          code: 'CONFIRM_PASSWORD_ERROR',
+        AppError.unknown(
+          message: 'Password confirmation failed',
+          details: e.toString(),
         ),
       );
     }
@@ -174,10 +174,10 @@ class AuthRepositoryImpl implements AuthRepository {
       
       final tokens = response.toAuthTokens();
       if (tokens == null) {
-        return const Left(
-          AppError(
+        return Left(
+          AppError.unknown(
             message: 'Failed to parse refresh response',
-            code: 'PARSE_ERROR',
+            details: 'Unable to convert Cognito response to AuthTokens',
           ),
         );
       }
@@ -188,9 +188,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(e);
     } catch (e) {
       return Left(
-        AppError(
-          message: e.toString(),
-          code: 'REFRESH_ERROR',
+        AppError.unknown(
+          message: 'Token refresh failed',
+          details: e.toString(),
         ),
       );
     }
@@ -205,9 +205,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(e);
     } catch (e) {
       return Left(
-        AppError(
-          message: e.toString(),
-          code: 'GET_USER_ERROR',
+        AppError.unknown(
+          message: 'Failed to get current user',
+          details: e.toString(),
         ),
       );
     }
@@ -223,9 +223,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(e);
     } catch (e) {
       return Left(
-        AppError(
-          message: e.toString(),
-          code: 'SIGNOUT_ERROR',
+        AppError.unknown(
+          message: 'Sign out failed',
+          details: e.toString(),
         ),
       );
     }
@@ -241,9 +241,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(e);
     } catch (e) {
       return Left(
-        AppError(
-          message: e.toString(),
-          code: 'EMAIL_CHECK_ERROR',
+        AppError.unknown(
+          message: 'Email authorization check failed',
+          details: e.toString(),
         ),
       );
     }

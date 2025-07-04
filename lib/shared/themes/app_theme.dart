@@ -119,7 +119,7 @@ class AppThemeNotifier extends StateNotifier<AppTheme> {
       ),
 
       // Card Theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.defaultRadius),
@@ -266,7 +266,7 @@ class AppThemeNotifier extends StateNotifier<AppTheme> {
       ),
 
       // Dialog Theme
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: baseColorScheme.surface,
         elevation: 8,
         shape: RoundedRectangleBorder(
@@ -370,7 +370,7 @@ class AppThemeNotifier extends StateNotifier<AppTheme> {
       ),
 
       // Card Theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.defaultRadius),

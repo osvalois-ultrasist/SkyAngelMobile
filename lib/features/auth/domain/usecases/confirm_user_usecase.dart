@@ -12,7 +12,17 @@ class ConfirmUserUseCase {
   Future<Either<AppError, bool>> call({
     required String username,
     required String code,
-  }) {
-    return _repository.confirmUser(username, code);
+  }) async {
+    try {
+      final result = await _repository.confirmUser(username, code);
+      return Right(result);
+    } on AppError catch (e) {
+      return Left(e);
+    } catch (e) {
+      return Left(AppError.unknown(
+        message: 'Error durante la confirmación',
+        details: e.toString(),
+      ));
+    }
   }
 }

@@ -8,7 +8,7 @@ import '../../di/injection.dart';
 
 @singleton
 class AuthInterceptor extends Interceptor {
-  final SecureStorage _secureStorage = locate<SecureStorage>();
+  SecureStorage get _secureStorage => locate<SecureStorage>();
 
   @override
   void onRequest(

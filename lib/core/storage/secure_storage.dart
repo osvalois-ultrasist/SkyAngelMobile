@@ -147,6 +147,21 @@ class SecureStorage {
     }
   }
 
+  // Legacy read method for backward compatibility
+  Future<String?> read(String key) async {
+    return await getString(key);
+  }
+
+  // Legacy write method for backward compatibility
+  Future<void> write(String key, String value) async {
+    return await setString(key, value);
+  }
+
+  // Legacy delete method for backward compatibility
+  Future<void> delete(String key) async {
+    return await deleteKey(key);
+  }
+
   Future<void> setBool(String key, bool value) async {
     try {
       await _storage.write(key: key, value: value.toString());

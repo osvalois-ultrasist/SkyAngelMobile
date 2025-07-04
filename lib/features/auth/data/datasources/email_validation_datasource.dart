@@ -27,19 +27,19 @@ class EmailValidationDataSourceImpl implements EmailValidationDataSource {
         return data['auth'] == 1;
       }
 
-      throw const AppError(
+      throw AppError.authorization(
         message: 'Usuario no autorizado',
-        code: 'EMAIL_NOT_AUTHORIZED',
+        details: 'El correo electrónico no está autorizado para usar la aplicación',
       );
     } on DioException catch (e) {
-      throw AppError(
+      throw AppError.network(
         message: e.response?.data['message'] ?? 'Error al validar correo',
-        code: 'EMAIL_VALIDATION_ERROR',
+        details: 'Error de red al validar el correo electrónico',
       );
     } catch (e) {
-      throw AppError(
-        message: e.toString(),
-        code: 'UNKNOWN_ERROR',
+      throw AppError.unknown(
+        message: 'Error al validar correo',
+        details: e.toString(),
       );
     }
   }

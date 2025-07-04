@@ -32,9 +32,10 @@ class CognitoResponseModel {
     final expiresIn = authenticationResult!.expiresIn ?? 3600;
     return AuthTokens(
       accessToken: authenticationResult!.accessToken ?? '',
-      idToken: authenticationResult!.idToken ?? '',
       refreshToken: authenticationResult!.refreshToken ?? '',
       expiresIn: expiresIn,
+      tokenType: authenticationResult!.tokenType ?? 'Bearer',
+      idToken: authenticationResult!.idToken,
       expiresAt: DateTime.now().add(Duration(seconds: expiresIn)),
     );
   }

@@ -69,7 +69,7 @@ Future<void> _registerExternalDependencies() async {
     ),
   );
   
-  // Add interceptors
+  // Add interceptors (storage services will be available after getIt.init())
   dio.interceptors.addAll([
     LoggingInterceptor(),
     AuthInterceptor(),
@@ -77,22 +77,8 @@ Future<void> _registerExternalDependencies() async {
   ]);
   
   getIt.registerSingleton<Dio>(dio);
-  
-  // Register DioClient and storage services
-  getIt.registerSingleton<DioClient>(DioClient(dio));
-  getIt.registerSingleton<SecureStorage>(
-    SecureStorage(getIt<FlutterSecureStorage>())
-  );
-  getIt.registerSingleton<PreferencesStorage>(
-    PreferencesStorage(getIt<SharedPreferences>())
-  );
 }
 
-@module
-abstract class RegisterModule {
-  @singleton
-  ErrorHandler errorHandler() => ErrorHandler();
-}
 
 // Service Locator helpers
 T locate<T extends Object>() => getIt<T>();

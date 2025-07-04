@@ -20,6 +20,7 @@ mixin _$RegisterRequest {
   String get password => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   String get familyName => throw _privateConstructorUsedError;
+  String get username => throw _privateConstructorUsedError;
   String? get phoneNumber => throw _privateConstructorUsedError;
 
   /// Create a copy of RegisterRequest
@@ -40,6 +41,7 @@ abstract class $RegisterRequestCopyWith<$Res> {
       String password,
       String name,
       String familyName,
+      String username,
       String? phoneNumber});
 }
 
@@ -62,6 +64,7 @@ class _$RegisterRequestCopyWithImpl<$Res, $Val extends RegisterRequest>
     Object? password = null,
     Object? name = null,
     Object? familyName = null,
+    Object? username = null,
     Object? phoneNumber = freezed,
   }) {
     return _then(_value.copyWith(
@@ -80,6 +83,10 @@ class _$RegisterRequestCopyWithImpl<$Res, $Val extends RegisterRequest>
       familyName: null == familyName
           ? _value.familyName
           : familyName // ignore: cast_nullable_to_non_nullable
+              as String,
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
               as String,
       phoneNumber: freezed == phoneNumber
           ? _value.phoneNumber
@@ -102,6 +109,7 @@ abstract class _$$RegisterRequestImplCopyWith<$Res>
       String password,
       String name,
       String familyName,
+      String username,
       String? phoneNumber});
 }
 
@@ -122,6 +130,7 @@ class __$$RegisterRequestImplCopyWithImpl<$Res>
     Object? password = null,
     Object? name = null,
     Object? familyName = null,
+    Object? username = null,
     Object? phoneNumber = freezed,
   }) {
     return _then(_$RegisterRequestImpl(
@@ -141,6 +150,10 @@ class __$$RegisterRequestImplCopyWithImpl<$Res>
           ? _value.familyName
           : familyName // ignore: cast_nullable_to_non_nullable
               as String,
+      username: null == username
+          ? _value.username
+          : username // ignore: cast_nullable_to_non_nullable
+              as String,
       phoneNumber: freezed == phoneNumber
           ? _value.phoneNumber
           : phoneNumber // ignore: cast_nullable_to_non_nullable
@@ -157,6 +170,7 @@ class _$RegisterRequestImpl extends _RegisterRequest {
       required this.password,
       required this.name,
       required this.familyName,
+      required this.username,
       this.phoneNumber})
       : super._();
 
@@ -169,11 +183,13 @@ class _$RegisterRequestImpl extends _RegisterRequest {
   @override
   final String familyName;
   @override
+  final String username;
+  @override
   final String? phoneNumber;
 
   @override
   String toString() {
-    return 'RegisterRequest(email: $email, password: $password, name: $name, familyName: $familyName, phoneNumber: $phoneNumber)';
+    return 'RegisterRequest(email: $email, password: $password, name: $name, familyName: $familyName, username: $username, phoneNumber: $phoneNumber)';
   }
 
   @override
@@ -187,13 +203,15 @@ class _$RegisterRequestImpl extends _RegisterRequest {
             (identical(other.name, name) || other.name == name) &&
             (identical(other.familyName, familyName) ||
                 other.familyName == familyName) &&
+            (identical(other.username, username) ||
+                other.username == username) &&
             (identical(other.phoneNumber, phoneNumber) ||
                 other.phoneNumber == phoneNumber));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, email, password, name, familyName, phoneNumber);
+  int get hashCode => Object.hash(
+      runtimeType, email, password, name, familyName, username, phoneNumber);
 
   /// Create a copy of RegisterRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -211,6 +229,7 @@ abstract class _RegisterRequest extends RegisterRequest {
       required final String password,
       required final String name,
       required final String familyName,
+      required final String username,
       final String? phoneNumber}) = _$RegisterRequestImpl;
   const _RegisterRequest._() : super._();
 
@@ -222,6 +241,8 @@ abstract class _RegisterRequest extends RegisterRequest {
   String get name;
   @override
   String get familyName;
+  @override
+  String get username;
   @override
   String? get phoneNumber;
 
