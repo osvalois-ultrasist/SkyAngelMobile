@@ -7,6 +7,7 @@
 .pub-cache/
 .pub/
 /build/
+build/
 pubspec.lock
 
 # Android related
@@ -19,6 +20,9 @@ pubspec.lock
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
 *.jks
+/android/app/debug
+/android/app/profile
+/android/app/release
 
 # iOS/Xcode related
 **/ios/**/*.mode1v3
@@ -49,11 +53,13 @@ pubspec.lock
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
-# Exceptions to above rules.
+# Exceptions to above rules
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
+!**/ios/Runner/Info.plist
+!**/android/app/src/main/AndroidManifest.xml
 
 # Web related
 lib/generated_plugin_registrant.dart
@@ -64,6 +70,19 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
+# Generated files
+*.g.dart
+*.freezed.dart
+*.gr.dart
+*.config.dart
+
+# Avoid committing generated Javascript files
+*.dart.js
+*.info.json
+*.js_
+*.js.deps
+*.js.map
+
 # IntelliJ related
 *.iml
 *.ipr
@@ -73,25 +92,12 @@ app.*.map.json
 # Visual Studio Code related
 .vscode/
 
-# Flutter/Dart/Pub related
-**/doc/api/
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
-build/
-
 # Directory created by dartdoc
 doc/api/
 
-# Avoid committing generated Javascript files:
-*.dart.js
-*.info.json
-*.js_
-*.js.deps
-*.js.map
+# Coverage
+coverage/
+lcov.info
 
 # macOS
 .DS_Store
@@ -113,46 +119,6 @@ Thumbs.db
 .svn/
 migrate_working_dir/
 
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
-/build/
-
-# Symbolication related
-app.*.symbols
-
-# Obfuscation related
-app.*.map.json
-
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
-
-# Coverage
-coverage/
-
-# Exceptions
-!**/ios/Runner/Info.plist
-!**/android/app/src/main/AndroidManifest.xml
-
 # Environment variables
 .env
 .env.*
@@ -160,6 +126,7 @@ coverage/
 # Firebase
 google-services.json
 GoogleService-Info.plist
+firebase_options.dart
 
 # Temporary files
 *.tmp
@@ -171,6 +138,8 @@ test-results/
 test-reports/
 
 # Backend and frontend directories (excluded)
+Back-Plat-SkyAngel-dev/
+sky_frontend_riesgos/
 backend/
 frontend/
 server/
