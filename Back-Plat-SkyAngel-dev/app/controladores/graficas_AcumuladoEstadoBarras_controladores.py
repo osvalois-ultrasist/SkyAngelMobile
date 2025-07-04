@@ -1,0 +1,77 @@
+import pandas as pd
+from app.mapper.graficas_AcumuladoEstadoBarras_mapper import AcumuladoBarrasEstadoMapper
+
+class AcumuladoBarrasEstadoService():
+    
+    def __init__(self):
+        self.AcumuladoBarrasEstado = AcumuladoBarrasEstadoMapper()
+
+    def obtenerDatos(self, jsonParametros):
+        try:
+            # Extraer parámetros del JSON
+            anios = jsonParametros.get("años", [])
+            mes = jsonParametros.get("mes", [])
+            entidad = jsonParametros.get("entidad", [])
+            municipio = jsonParametros.get("municipio", [])
+
+            # Inicializar lista de errores
+            errores = []
+
+            # Validar parámetros requeridos
+            if not anios:  # Validación explícita
+                errores.append("El parámetro 'anios' no puede estar vacío.")
+            if not mes:  # Validación explícita
+                errores.append("El parámetro 'mes' no puede estar vacío.")
+            if not entidad:  # Validación explícita
+                errores.append("El parámetro 'entidad' no puede estar vacío.")
+            if not municipio:  # Validación explícita
+                errores.append("El parámetro 'municipio' no puede estar vacío.")
+
+            if errores:
+                return {"Errores": errores}, 400
+
+            # Obtener los datos del mapper
+            data = self.AcumuladoBarrasEstado.selectIncidentes(anios, mes, entidad, municipio)
+            
+            df = pd.DataFrame(data['data'])
+            dfSmall = df[["anio", "idEntidad", "entidad", "total_crimenes"]]    
+            dfTotalCrimenes = dfSmall.groupby('entidad')['total_crimenes'].sum().reset_index()
+
+            dfTotalCrimenes = dfTotalCrimenes.sort_values('total_crimenes', ascending=False)
+
+            result = [
+                {
+                    "entidad": row['entidad'],
+                    "crimenes": int(row['total_crimenes'])
+                } 
+                for _, row in dfTotalCrimenes.iterrows()
+                ]
+
+            serie = {
+                'dataKey': 'crimenes',
+                'valueFormatterText': 'crímenes',
+                'color': '#1C57AA',
+                'barWidth': 20,
+                'barSpacing': 5,
+                'fontSize': 14,
+                'fontColor': '#0D125B',
+                'chartWidth': [850],
+                'chartHeight': [300],
+                'yAxisDataKey': 'entidad',
+                'yAxisColor': '#0D125B',
+                'yAxisWidth': [500],
+                'xAxisLabel': 'Número de Crímenes',
+                'xAxisColor': '#0D125B',
+                'scaleType': 'band',
+                'layout': 'horizontal',
+                'grid': {'vertical': True},
+                'margin': {'top': 20, 'right': 50, 'bottom': 20, 'left': 150}
+            }
+
+            return {
+                'title': "Total de delitos por Entidad Federativa", 
+                'serie': serie, 
+                'data': result
+                }, 200
+        except Exception as e:
+            return {"Error": f"Error del servidor: {str(e)}"}, 500

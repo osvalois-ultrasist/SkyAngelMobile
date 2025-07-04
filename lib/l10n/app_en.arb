@@ -1,0 +1,151 @@
+{
+  "@@locale": "en",
+  "appTitle": "SkyAngel Mobile",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "welcome": "Welcome",
+  "@welcome": {
+    "description": "Welcome message"
+  },
+  "home": "Home",
+  "@home": {
+    "description": "Home tab"
+  },
+  "map": "Map",
+  "@map": {
+    "description": "Map tab"
+  },
+  "alerts": "Alerts",
+  "@alerts": {
+    "description": "Alerts tab"
+  },
+  "routes": "Routes",
+  "@routes": {
+    "description": "Routes tab"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile tab"
+  },
+  "login": "Login",
+  "@login": {
+    "description": "Login button"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Email field"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password field"
+  },
+  "forgotPassword": "Forgot Password?",
+  "@forgotPassword": {
+    "description": "Forgot password link"
+  },
+  "register": "Register",
+  "@register": {
+    "description": "Register button"
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading message"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Error message"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "App settings"
+  },
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme setting"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language setting"
+  },
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications setting"
+  },
+  "privacy": "Privacy",
+  "@privacy": {
+    "description": "Privacy setting"
+  },
+  "about": "About",
+  "@about": {
+    "description": "About the app"
+  },
+  "version": "Version",
+  "@version": {
+    "description": "App version"
+  },
+  "crimeMap": "Crime Map",
+  "@crimeMap": {
+    "description": "Crime map title"
+  },
+  "safeRoutes": "Safe Routes",
+  "@safeRoutes": {
+    "description": "Safe routes title"
+  },
+  "securityAlerts": "Security Alerts",
+  "@securityAlerts": {
+    "description": "Security alerts title"
+  },
+  "interactiveMaps": "Interactive Maps",
+  "@interactiveMaps": {
+    "description": "Interactive maps feature"
+  },
+  "realTimeAlerts": "Real-time Alerts",
+  "@realTimeAlerts": {
+    "description": "Real-time alerts feature"
+  },
+  "optimizedRoutes": "Optimized Routes",
+  "@optimizedRoutes": {
+    "description": "Optimized routes feature"
+  },
+  "visualizeCrimeData": "Visualize crime data in real time",
+  "@visualizeCrimeData": {
+    "description": "Crime data visualization description"
+  },
+  "calculateSafeRoutes": "Calculate optimized routes with risk analysis",
+  "@calculateSafeRoutes": {
+    "description": "Safe routes calculation description"
+  },
+  "receiveInstantNotifications": "Receive instant security notifications",
+  "@receiveInstantNotifications": {
+    "description": "Instant notifications description"
+  }
+}

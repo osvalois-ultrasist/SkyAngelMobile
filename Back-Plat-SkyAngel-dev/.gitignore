@@ -1,0 +1,17 @@
+.env
+VE-Back
+app/__pycache__
+app/configuraciones/__pycache__
+app/controladores/__pycache__
+app/vistas/__pycache__
+app/modelos/__pycache__
+app/mapper/__pycache__
+Test/Puebas_Conexion.ipynb
+Test/Pruebas_Graficas.ipynb
+Test/Pruebas_unitarias_anerpv.ipynb
+.gitignore copy
+vistas/endp_incidencias_por_anio.py
+Notas.md
+*__pycache__
+app/estaticos/Poligonos/*
+/venv

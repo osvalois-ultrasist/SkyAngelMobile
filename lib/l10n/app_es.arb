@@ -1,0 +1,151 @@
+{
+  "@@locale": "es",
+  "appTitle": "SkyAngel Mobile",
+  "@appTitle": {
+    "description": "Título de la aplicación"
+  },
+  "welcome": "Bienvenido",
+  "@welcome": {
+    "description": "Mensaje de bienvenida"
+  },
+  "home": "Inicio",
+  "@home": {
+    "description": "Pestaña de inicio"
+  },
+  "map": "Mapa",
+  "@map": {
+    "description": "Pestaña de mapa"
+  },
+  "alerts": "Alertas",
+  "@alerts": {
+    "description": "Pestaña de alertas"
+  },
+  "routes": "Rutas",
+  "@routes": {
+    "description": "Pestaña de rutas"
+  },
+  "profile": "Perfil",
+  "@profile": {
+    "description": "Pestaña de perfil"
+  },
+  "login": "Iniciar Sesión",
+  "@login": {
+    "description": "Botón de inicio de sesión"
+  },
+  "logout": "Cerrar Sesión",
+  "@logout": {
+    "description": "Botón de cerrar sesión"
+  },
+  "email": "Correo Electrónico",
+  "@email": {
+    "description": "Campo de correo electrónico"
+  },
+  "password": "Contraseña",
+  "@password": {
+    "description": "Campo de contraseña"
+  },
+  "forgotPassword": "¿Olvidaste tu contraseña?",
+  "@forgotPassword": {
+    "description": "Enlace de contraseña olvidada"
+  },
+  "register": "Registrarse",
+  "@register": {
+    "description": "Botón de registro"
+  },
+  "loading": "Cargando...",
+  "@loading": {
+    "description": "Mensaje de carga"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Mensaje de error"
+  },
+  "retry": "Reintentar",
+  "@retry": {
+    "description": "Botón de reintentar"
+  },
+  "cancel": "Cancelar",
+  "@cancel": {
+    "description": "Botón de cancelar"
+  },
+  "confirm": "Confirmar",
+  "@confirm": {
+    "description": "Botón de confirmar"
+  },
+  "save": "Guardar",
+  "@save": {
+    "description": "Botón de guardar"
+  },
+  "delete": "Eliminar",
+  "@delete": {
+    "description": "Botón de eliminar"
+  },
+  "edit": "Editar",
+  "@edit": {
+    "description": "Botón de editar"
+  },
+  "settings": "Configuración",
+  "@settings": {
+    "description": "Configuración de la aplicación"
+  },
+  "theme": "Tema",
+  "@theme": {
+    "description": "Configuración del tema"
+  },
+  "language": "Idioma",
+  "@language": {
+    "description": "Configuración del idioma"
+  },
+  "notifications": "Notificaciones",
+  "@notifications": {
+    "description": "Configuración de notificaciones"
+  },
+  "privacy": "Privacidad",
+  "@privacy": {
+    "description": "Configuración de privacidad"
+  },
+  "about": "Acerca de",
+  "@about": {
+    "description": "Información de la aplicación"
+  },
+  "version": "Versión",
+  "@version": {
+    "description": "Versión de la aplicación"
+  },
+  "crimeMap": "Mapa de Delitos",
+  "@crimeMap": {
+    "description": "Título del mapa de delitos"
+  },
+  "safeRoutes": "Rutas Seguras",
+  "@safeRoutes": {
+    "description": "Título de rutas seguras"
+  },
+  "securityAlerts": "Alertas de Seguridad",
+  "@securityAlerts": {
+    "description": "Título de alertas de seguridad"
+  },
+  "interactiveMaps": "Mapas Interactivos",
+  "@interactiveMaps": {
+    "description": "Característica de mapas interactivos"
+  },
+  "realTimeAlerts": "Alertas en Tiempo Real",
+  "@realTimeAlerts": {
+    "description": "Característica de alertas en tiempo real"
+  },
+  "optimizedRoutes": "Rutas Optimizadas",
+  "@optimizedRoutes": {
+    "description": "Característica de rutas optimizadas"
+  },
+  "visualizeCrimeData": "Visualiza datos de criminalidad en tiempo real",
+  "@visualizeCrimeData": {
+    "description": "Descripción de visualización de datos"
+  },
+  "calculateSafeRoutes": "Calcula rutas optimizadas con análisis de riesgo",
+  "@calculateSafeRoutes": {
+    "description": "Descripción de cálculo de rutas"
+  },
+  "receiveInstantNotifications": "Recibe notificaciones de seguridad instantáneas",
+  "@receiveInstantNotifications": {
+    "description": "Descripción de notificaciones instantáneas"
+  }
+}
