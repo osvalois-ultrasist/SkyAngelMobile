@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../shared/widgets/loading_widget.dart';
-import '../../../../shared/widgets/app_drawer.dart';
+import '../../../../shared/widgets/unified_menu.dart';
+import '../../../app/presentation/providers/navigation_provider.dart';
 import '../../domain/entities/alert_entity.dart';
 import '../providers/alert_provider.dart';
 import '../providers/alert_state.dart';
@@ -69,8 +70,10 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
             const Text('Alertas de Seguridad'),
           ],
         ),
+        centerTitle: true,
         backgroundColor: theme.colorScheme.surface,
-        elevation: 0,
+        elevation: 2,
+        shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -183,7 +186,6 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
           ),
         ),
       ),
-      drawer: const AppDrawer(),
       body: Column(
         children: [
           // Statistics Card

@@ -3,10 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../shared/widgets/loading_widget.dart';
-import '../../../../shared/widgets/app_drawer.dart';
+import '../../../../shared/widgets/unified_menu.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
-import '../../../alertas/presentation/pages/alerts_page.dart';
+import '../providers/navigation_provider.dart';
 
 class AppPage extends ConsumerStatefulWidget {
   final int initialTab;
@@ -18,86 +17,44 @@ class AppPage extends ConsumerStatefulWidget {
 }
 
 class AppPageState extends ConsumerState<AppPage> {
-  late int _currentIndex;
-
-  late final List<Widget> _pages;
-
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.initialTab;
-    
-    _pages = [
-      HomePage(onNavigateToTab: updateCurrentIndex),
-      const MapPage(),
-      const AlertsPage(),
-      const RoutesPage(),
-      const ProfilePage(),
-    ];
-  }
-
-  void updateCurrentIndex(int index) {
-    setState(() {
-      _currentIndex = index;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(navigationProvider.notifier).navigateToTab(widget.initialTab);
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
+    final currentPage = ref.watch(currentPageProvider);
+    final navigation = ref.watch(navigationProvider);
+    
     return Scaffold(
-      body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _currentIndex,
+      body: currentPage,
+      bottomNavigationBar: UnifiedBottomNavigation(
+        currentIndex: navigation.currentIndex,
         onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
+          ref.read(navigationProvider.notifier).setCurrentIndex(index);
         },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Inicio',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map_outlined),
-            activeIcon: Icon(Icons.map),
-            label: 'Mapa',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.warning_amber_outlined),
-            activeIcon: Icon(Icons.warning_amber),
-            label: 'Alertas',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.route_outlined),
-            activeIcon: Icon(Icons.route),
-            label: 'Rutas',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
-        ],
       ),
     );
   }
 }
 
 // Placeholder pages - these will be implemented later
-class HomePage extends StatelessWidget {
-  final Function(int) onNavigateToTab;
-  
-  const HomePage({super.key, required this.onNavigateToTab});
+class HomePage extends ConsumerWidget {
+  const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('SkyAngel'),
         centerTitle: true,
+        elevation: 2,
+        shadowColor: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -113,7 +70,6 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      drawer: const AppDrawer(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -146,7 +102,7 @@ class HomePage extends StatelessWidget {
               icon: Icons.map,
               title: 'Mapas Interactivos',
               description: 'Visualiza datos de criminalidad en tiempo real',
-              onTap: () => onNavigateToTab(1),
+              onTap: () => ref.read(navigationProvider.notifier).navigateToTab(1),
             ),
             const SizedBox(height: 16),
             _AnimatedFeatureCard(
@@ -154,7 +110,7 @@ class HomePage extends StatelessWidget {
               icon: Icons.route,
               title: 'Rutas Seguras',
               description: 'Calcula rutas optimizadas con análisis de riesgo',
-              onTap: () => onNavigateToTab(3),
+              onTap: () => ref.read(navigationProvider.notifier).navigateToTab(3),
             ),
             const SizedBox(height: 16),
             _AnimatedFeatureCard(
@@ -162,7 +118,7 @@ class HomePage extends StatelessWidget {
               icon: Icons.notifications,
               title: 'Alertas en Tiempo Real',
               description: 'Recibe notificaciones de seguridad instantáneas',
-              onTap: () => onNavigateToTab(2),
+              onTap: () => ref.read(navigationProvider.notifier).navigateToTab(2),
             ),
           ],
         ),
@@ -391,6 +347,8 @@ class MapPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Mapa de Delitos'),
         centerTitle: true,
+        elevation: 2,
+        shadowColor: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
         actions: [
           IconButton(
             icon: const Icon(Icons.layers),
@@ -406,7 +364,6 @@ class MapPage extends StatelessWidget {
           ),
         ],
       ),
-      drawer: const AppDrawer(),
       body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -449,6 +406,8 @@ class AlertsPlaceholderPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Alertas'),
         centerTitle: true,
+        elevation: 2,
+        shadowColor: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
       ),
       body: const Center(
         child: Column(
@@ -483,63 +442,6 @@ class AlertsPlaceholderPage extends StatelessWidget {
   }
 }
 
-class RoutesPage extends StatelessWidget {
-  const RoutesPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Rutas Seguras'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.navigation),
-            onPressed: () {
-              // TODO: Start navigation
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.route),
-            onPressed: () {
-              // TODO: Show route options
-            },
-          ),
-        ],
-      ),
-      drawer: const AppDrawer(),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.route,
-              size: 80,
-              color: Colors.purple,
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Rutas Seguras',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Calcula rutas optimizadas\ncon análisis de riesgo integrado',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -554,6 +456,8 @@ class ProfilePage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Perfil'),
         centerTitle: true,
+        elevation: 2,
+        shadowColor: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
         actions: [
           IconButton(
             onPressed: () async {
