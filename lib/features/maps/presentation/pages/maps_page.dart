@@ -4,8 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../../shared/widgets/loading_widget.dart';
-import '../../../../shared/widgets/unified_menu.dart';
-import '../../../app/presentation/providers/navigation_provider.dart';
+import '../../../../shared/widgets/unified_app_bar.dart';
 import '../../domain/entities/risk_polygon.dart';
 import '../../domain/entities/poi_entity.dart';
 import '../../domain/entities/risk_level.dart';
@@ -62,39 +61,17 @@ class _MapsPageState extends ConsumerState<MapsPage>
     final theme = Theme.of(context);
     
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.map,
-                color: theme.colorScheme.onPrimaryContainer,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Text('Mapa de Riesgos'),
-          ],
-        ),
-        centerTitle: true,
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 2,
-        shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
+      appBar: UnifiedAppBarFactory.maps(
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
             onPressed: () {
               ref.read(mapsNotifierProvider.notifier).refreshData();
             },
             tooltip: 'Actualizar mapa',
           ),
           IconButton(
-            icon: Icon(_showRiskLegend ? Icons.legend_toggle : Icons.legend_toggle_outlined),
+            icon: Icon(_showRiskLegend ? Icons.toggle_on_rounded : Icons.toggle_off_rounded),
             onPressed: () {
               setState(() {
                 _showRiskLegend = !_showRiskLegend;
@@ -103,19 +80,19 @@ class _MapsPageState extends ConsumerState<MapsPage>
             tooltip: 'Mostrar leyenda',
           ),
           IconButton(
-            icon: const Icon(Icons.layers),
+            icon: const Icon(Icons.layers_rounded),
             onPressed: () => _showLayersBottomSheet(context),
             tooltip: 'Capas del mapa',
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert_rounded),
             onSelected: (value) => _handleMenuAction(value, context),
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: 'center_location',
                 child: Row(
                   children: [
-                    const Icon(Icons.my_location),
+                    const Icon(Icons.my_location_rounded),
                     const SizedBox(width: 8),
                     const Text('Centrar en mi ubicación'),
                   ],
@@ -125,7 +102,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
                 value: 'export',
                 child: Row(
                   children: [
-                    Icon(Icons.download),
+                    Icon(Icons.download_rounded),
                     SizedBox(width: 8),
                     Text('Exportar mapa'),
                   ],
@@ -135,7 +112,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
                 value: 'help',
                 child: Row(
                   children: [
-                    Icon(Icons.help_outline),
+                    Icon(Icons.help_outline_rounded),
                     SizedBox(width: 8),
                     Text('Ayuda'),
                   ],
@@ -144,10 +121,13 @@ class _MapsPageState extends ConsumerState<MapsPage>
             ],
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(100),
-          child: Column(
+      ),
+      body: Stack(
+        children: [
+          // Main content
+          Column(
             children: [
+              // Tab Bar
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: TabBar(
@@ -159,12 +139,14 @@ class _MapsPageState extends ConsumerState<MapsPage>
                   indicatorSize: TabBarIndicatorSize.tab,
                   labelStyle: const TextStyle(fontWeight: FontWeight.w600),
                   tabs: const [
-                    Tab(text: 'Mapa', icon: Icon(Icons.map, size: 20)),
-                    Tab(text: 'Riesgos', icon: Icon(Icons.warning, size: 20)),
-                    Tab(text: 'POIs', icon: Icon(Icons.place, size: 20)),
+                    Tab(text: 'Mapa', icon: Icon(Icons.map_rounded, size: 20)),
+                    Tab(text: 'Riesgos', icon: Icon(Icons.warning_rounded, size: 20)),
+                    Tab(text: 'POIs', icon: Icon(Icons.place_rounded, size: 20)),
                   ],
                 ),
               ),
+              
+              // Active filters
               if (_activeRiskFilter != null || _activePOIFilter != null)
                 Container(
                   height: 50,
@@ -175,7 +157,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
                         Chip(
                           label: Text('Filtro de Riesgo Activo'),
                           backgroundColor: theme.colorScheme.errorContainer,
-                          deleteIcon: const Icon(Icons.close, size: 16),
+                          deleteIcon: const Icon(Icons.close_rounded, size: 16),
                           onDeleted: () => _clearRiskFilter(),
                         ),
                       if (_activeRiskFilter != null && _activePOIFilter != null)
@@ -184,7 +166,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
                         Chip(
                           label: Text('Filtro de POI Activo'),
                           backgroundColor: theme.colorScheme.secondaryContainer,
-                          deleteIcon: const Icon(Icons.close, size: 16),
+                          deleteIcon: const Icon(Icons.close_rounded, size: 16),
                           onDeleted: () => _clearPOIFilter(),
                         ),
                       const Spacer(),
@@ -194,7 +176,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
                             _clearRiskFilter();
                             _clearPOIFilter();
                           },
-                          icon: const Icon(Icons.clear_all, size: 16),
+                          icon: const Icon(Icons.clear_all_rounded, size: 16),
                           label: const Text('Limpiar todo'),
                           style: TextButton.styleFrom(
                             foregroundColor: theme.colorScheme.onSurfaceVariant,
@@ -203,15 +185,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
                     ],
                   ),
                 ),
-            ],
-          ),
-        ),
-      ),
-      body: Stack(
-        children: [
-          // Main content
-          Column(
-            children: [
+              
               // Search bar
               Container(
                 padding: const EdgeInsets.all(16),
@@ -262,7 +236,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
             backgroundColor: theme.colorScheme.primaryContainer,
             foregroundColor: theme.colorScheme.onPrimaryContainer,
             mini: true,
-            child: const Icon(Icons.my_location),
+            child: const Icon(Icons.my_location_rounded),
           ),
           const SizedBox(height: 8),
           FloatingActionButton(
@@ -271,7 +245,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
             backgroundColor: theme.colorScheme.secondaryContainer,
             foregroundColor: theme.colorScheme.onSecondaryContainer,
             mini: true,
-            child: const Icon(Icons.filter_list),
+            child: const Icon(Icons.filter_list_rounded),
           ),
         ],
       ),
@@ -299,7 +273,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const Icon(Icons.error_outline_rounded, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
               'Error al cargar el mapa',
@@ -331,7 +305,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.check_circle_outline, size: 64, color: Colors.green),
+            Icon(Icons.check_circle_outline_rounded, size: 64, color: Colors.green),
             SizedBox(height: 16),
             Text(
               'No hay zonas de alto riesgo',
@@ -370,7 +344,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
               overflow: TextOverflow.ellipsis,
             ),
             trailing: IconButton(
-              icon: const Icon(Icons.map),
+              icon: const Icon(Icons.map_rounded),
               onPressed: () {
                 _tabController.animateTo(0);
                 _centerMapOnPolygon(polygon);
@@ -389,7 +363,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.location_off, size: 64, color: Colors.grey),
+            Icon(Icons.location_off_rounded, size: 64, color: Colors.grey),
             SizedBox(height: 16),
             Text(
               'No hay puntos de interés',
@@ -438,7 +412,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
               ],
             ),
             trailing: IconButton(
-              icon: const Icon(Icons.map),
+              icon: const Icon(Icons.map_rounded),
               onPressed: () {
                 _tabController.animateTo(0);
                 _centerMapOnPOI(poi);
@@ -630,7 +604,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
                 children: [
                   const Text('Calificación: '),
                   ...List.generate(5, (index) => Icon(
-                    index < poi.rating! ? Icons.star : Icons.star_border,
+                    index < poi.rating! ? Icons.star_rounded : Icons.star_border_rounded,
                     size: 16,
                     color: Colors.amber,
                   )),
@@ -724,7 +698,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
       builder: (context) => AlertDialog(
         title: const Row(
           children: [
-            Icon(Icons.download),
+            Icon(Icons.download_rounded),
             SizedBox(width: 8),
             Text('Exportar mapa'),
           ],
@@ -760,7 +734,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
       builder: (context) => AlertDialog(
         title: const Row(
           children: [
-            Icon(Icons.help_outline),
+            Icon(Icons.help_outline_rounded),
             SizedBox(width: 8),
             Text('Ayuda del Mapa'),
           ],
@@ -827,14 +801,14 @@ class _MapsPageState extends ConsumerState<MapsPage>
     switch (riskLevel) {
       case RiskLevelType.veryLow:
       case RiskLevelType.low:
-        return Icons.check_circle;
+        return Icons.check_circle_rounded;
       case RiskLevelType.moderate:
-        return Icons.warning;
+        return Icons.warning_rounded;
       case RiskLevelType.high:
       case RiskLevelType.veryHigh:
-        return Icons.error;
+        return Icons.error_rounded;
       case RiskLevelType.extreme:
-        return Icons.dangerous;
+        return Icons.dangerous_rounded;
     }
   }
 }

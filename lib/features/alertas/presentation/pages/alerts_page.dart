@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../shared/widgets/loading_widget.dart';
-import '../../../../shared/widgets/unified_menu.dart';
-import '../../../app/presentation/providers/navigation_provider.dart';
+import '../../../../shared/widgets/unified_app_bar.dart';
 import '../../domain/entities/alert_entity.dart';
 import '../providers/alert_provider.dart';
 import '../providers/alert_state.dart';
@@ -51,32 +50,10 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
     final theme = Theme.of(context);
     
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.errorContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.warning_amber,
-                color: theme.colorScheme.onErrorContainer,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Text('Alertas de Seguridad'),
-          ],
-        ),
-        centerTitle: true,
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 2,
-        shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
+      appBar: UnifiedAppBarFactory.alerts(
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
             onPressed: () {
               ref.read(alertNotifierProvider.notifier).loadActiveAlerts();
               ref.read(alertStatisticsNotifierProvider.notifier).refresh();
@@ -84,19 +61,19 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
             tooltip: 'Actualizar alertas',
           ),
           IconButton(
-            icon: const Icon(Icons.filter_list),
+            icon: const Icon(Icons.filter_list_rounded),
             onPressed: () => _showFilterBottomSheet(context),
             tooltip: 'Filtrar alertas',
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert_rounded),
             onSelected: (value) => _handleMenuAction(value, context),
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 'export',
                 child: Row(
                   children: [
-                    Icon(Icons.download),
+                    Icon(Icons.download_rounded),
                     SizedBox(width: 8),
                     Text('Exportar datos'),
                   ],
@@ -106,7 +83,7 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
                 value: 'settings',
                 child: Row(
                   children: [
-                    Icon(Icons.settings),
+                    Icon(Icons.settings_rounded),
                     SizedBox(width: 8),
                     Text('Configuración'),
                   ],
@@ -116,7 +93,7 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
                 value: 'help',
                 child: Row(
                   children: [
-                    Icon(Icons.help_outline),
+                    Icon(Icons.help_outline_rounded),
                     SizedBox(width: 8),
                     Text('Ayuda'),
                   ],
@@ -125,75 +102,71 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
             ],
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(100),
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: TabBar(
-                  controller: _tabController,
-                  labelColor: theme.colorScheme.primary,
-                  unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
-                  indicatorColor: theme.colorScheme.primary,
-                  indicatorWeight: 3,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-                  tabs: const [
-                    Tab(text: 'Todas', icon: Icon(Icons.list, size: 20)),
-                    Tab(text: 'Prioritarias', icon: Icon(Icons.priority_high, size: 20)),
-                    Tab(text: 'Recientes', icon: Icon(Icons.access_time, size: 20)),
-                  ],
-                ),
-              ),
-              if (_selectedType != null || _selectedPriority != null)
-                Container(
-                  height: 50,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      if (_selectedType != null)
-                        AlertFilterChip(
-                          label: _selectedType!.name.toUpperCase(),
-                          onDeleted: () => setState(() => _selectedType = null),
-                        ),
-                      if (_selectedType != null && _selectedPriority != null)
-                        const SizedBox(width: 8),
-                      if (_selectedPriority != null)
-                        AlertFilterChip(
-                          label: _selectedPriority!.name.toUpperCase(),
-                          backgroundColor: theme.colorScheme.secondary,
-                          onDeleted: () => setState(() => _selectedPriority = null),
-                        ),
-                      const Spacer(),
-                      TextButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            _selectedType = null;
-                            _selectedPriority = null;
-                          });
-                        },
-                        icon: const Icon(Icons.clear_all, size: 16),
-                        label: const Text('Limpiar'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ),
       ),
       body: Column(
         children: [
+          // TabBar moved from AppBar
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TabBar(
+              controller: _tabController,
+              labelColor: theme.colorScheme.primary,
+              unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
+              indicatorColor: theme.colorScheme.primary,
+              indicatorWeight: 3,
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelStyle: const TextStyle(fontWeight: FontWeight.w600),
+              tabs: const [
+                Tab(text: 'Todas', icon: Icon(Icons.list_rounded, size: 20)),
+                Tab(text: 'Prioritarias', icon: Icon(Icons.priority_high_rounded, size: 20)),
+                Tab(text: 'Recientes', icon: Icon(Icons.access_time_rounded, size: 20)),
+              ],
+            ),
+          ),
+          
+          // Filter chips section
+          if (_selectedType != null || _selectedPriority != null)
+            Container(
+              height: 50,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  if (_selectedType != null)
+                    AlertFilterChip(
+                      label: _selectedType!.name.toUpperCase(),
+                      onDeleted: () => setState(() => _selectedType = null),
+                    ),
+                  if (_selectedType != null && _selectedPriority != null)
+                    const SizedBox(width: 8),
+                  if (_selectedPriority != null)
+                    AlertFilterChip(
+                      label: _selectedPriority!.name.toUpperCase(),
+                      backgroundColor: theme.colorScheme.secondary,
+                      onDeleted: () => setState(() => _selectedPriority = null),
+                    ),
+                  const Spacer(),
+                  TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _selectedType = null;
+                        _selectedPriority = null;
+                      });
+                    },
+                    icon: const Icon(Icons.clear_all_rounded, size: 16),
+                    label: const Text('Limpiar'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          
           // Statistics Card
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: AlertStatisticsWidget(),
           ),
-          
           
           // Content
           Expanded(
@@ -226,7 +199,7 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.notifications_off, size: 64, color: Colors.grey),
+                Icon(Icons.notifications_off_rounded, size: 64, color: Colors.grey),
                 SizedBox(height: 16),
                 Text(
                   'No hay alertas que mostrar',
@@ -266,7 +239,7 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const Icon(Icons.error_outline_rounded, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
               'Error al cargar alertas',
@@ -298,7 +271,7 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.check_circle_outline, size: 64, color: Colors.green),
+            Icon(Icons.check_circle_outline_rounded, size: 64, color: Colors.green),
             SizedBox(height: 16),
             Text(
               'No hay alertas de alta prioridad',
@@ -336,7 +309,7 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.schedule, size: 64, color: Colors.grey),
+            Icon(Icons.schedule_rounded, size: 64, color: Colors.grey),
             SizedBox(height: 16),
             Text(
               'No hay alertas recientes',
@@ -474,7 +447,7 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
       builder: (context) => AlertDialog(
         title: const Row(
           children: [
-            Icon(Icons.download),
+            Icon(Icons.download_rounded),
             SizedBox(width: 8),
             Text('Exportar datos'),
           ],
@@ -510,7 +483,7 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
       builder: (context) => AlertDialog(
         title: const Row(
           children: [
-            Icon(Icons.settings),
+            Icon(Icons.settings_rounded),
             SizedBox(width: 8),
             Text('Configuración'),
           ],
@@ -519,7 +492,7 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.notifications),
+              leading: const Icon(Icons.notifications_rounded),
               title: const Text('Notificaciones'),
               trailing: Switch(
                 value: true,
@@ -529,7 +502,7 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.refresh),
+              leading: const Icon(Icons.refresh_rounded),
               title: const Text('Actualización automática'),
               trailing: Switch(
                 value: true,
@@ -556,7 +529,7 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
       builder: (context) => AlertDialog(
         title: const Row(
           children: [
-            Icon(Icons.help_outline),
+            Icon(Icons.help_outline_rounded),
             SizedBox(width: 8),
             Text('Ayuda'),
           ],

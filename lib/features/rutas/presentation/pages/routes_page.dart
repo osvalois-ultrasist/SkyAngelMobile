@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../../shared/widgets/loading_widget.dart';
-import '../../../../shared/widgets/unified_menu.dart';
-import '../../../app/presentation/providers/navigation_provider.dart';
+import '../../../../shared/widgets/unified_app_bar.dart';
 import '../../domain/entities/route_entity.dart';
 import '../providers/routes_provider.dart';
 import '../widgets/route_search_widget.dart';
@@ -54,32 +53,10 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
     final savedRoutesState = ref.watch(savedRoutesNotifierProvider);
     
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.route,
-                color: theme.colorScheme.onPrimaryContainer,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Text('Rutas Seguras'),
-          ],
-        ),
-        centerTitle: true,
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 2,
-        shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
+      appBar: UnifiedAppBarFactory.routes(
         actions: [
           IconButton(
-            icon: Icon(_showMap ? Icons.list : Icons.map),
+            icon: Icon(_showMap ? Icons.list_rounded : Icons.map_rounded),
             onPressed: () {
               setState(() {
                 _showMap = !_showMap;
@@ -88,7 +65,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
             tooltip: _showMap ? 'Ver lista' : 'Ver mapa',
           ),
           PopupMenuButton<RouteType>(
-            icon: const Icon(Icons.tune),
+            icon: const Icon(Icons.tune_rounded),
             tooltip: 'Opciones de ruta',
             onSelected: (routeType) {
               setState(() {
@@ -122,14 +99,16 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
             ).toList(),
           ),
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
             onPressed: _refreshData,
             tooltip: 'Actualizar',
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
-          child: Container(
+      ),
+      body: Column(
+        children: [
+          // TabBar moved here since UnifiedAppBar doesn't support bottom parameter
+          Container(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: TabBar(
               controller: _tabController,
@@ -138,16 +117,12 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
               indicatorColor: theme.colorScheme.primary,
               indicatorWeight: 3,
               tabs: const [
-                Tab(text: 'Buscar', icon: Icon(Icons.search, size: 16)),
-                Tab(text: 'Guardadas', icon: Icon(Icons.bookmark, size: 16)),
-                Tab(text: 'Historial', icon: Icon(Icons.history, size: 16)),
+                Tab(text: 'Buscar', icon: Icon(Icons.search_rounded, size: 16)),
+                Tab(text: 'Guardadas', icon: Icon(Icons.bookmark_rounded, size: 16)),
+                Tab(text: 'Historial', icon: Icon(Icons.history_rounded, size: 16)),
               ],
             ),
           ),
-        ),
-      ),
-      body: Column(
-        children: [
           // Route search bar (always visible)
           Container(
             padding: const EdgeInsets.all(16),
@@ -183,7 +158,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
       floatingActionButton: _origin != null && _destination != null
           ? FloatingActionButton.extended(
               onPressed: () => _showRouteOptionsDialog(context),
-              icon: const Icon(Icons.navigation),
+              icon: const Icon(Icons.navigation_rounded),
               label: const Text('Comenzar'),
             )
           : null,
@@ -197,7 +172,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.route,
+              Icons.route_rounded,
               size: 80,
               color: Colors.grey[400],
             ),
@@ -226,7 +201,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
                     Row(
                       children: [
                         Icon(
-                          Icons.security,
+                          Icons.security_rounded,
                           color: Colors.green,
                           size: 20,
                         ),
@@ -241,7 +216,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
                     Row(
                       children: [
                         Icon(
-                          Icons.trending_up,
+                          Icons.trending_up_rounded,
                           color: Colors.blue,
                           size: 20,
                         ),
@@ -256,7 +231,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
                     Row(
                       children: [
                         Icon(
-                          Icons.warning_amber,
+                          Icons.warning_amber_rounded,
                           color: Colors.orange,
                           size: 20,
                         ),
@@ -282,7 +257,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const Icon(Icons.error_outline_rounded, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
               'Error al calcular rutas',
@@ -308,7 +283,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.route_outlined, size: 64, color: Colors.grey),
+                Icon(Icons.route_rounded, size: 64, color: Colors.grey),
                 SizedBox(height: 16),
                 Text('No se encontraron rutas'),
                 SizedBox(height: 8),
@@ -340,7 +315,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const Icon(Icons.error_outline_rounded, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
               'Error al cargar rutas guardadas',
@@ -361,7 +336,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.bookmark_border, size: 64, color: Colors.grey),
+                Icon(Icons.bookmark_border_rounded, size: 64, color: Colors.grey),
                 SizedBox(height: 16),
                 Text('No tienes rutas guardadas'),
                 SizedBox(height: 8),
@@ -386,7 +361,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.history, size: 64, color: Colors.grey),
+          Icon(Icons.history_rounded, size: 64, color: Colors.grey),
           SizedBox(height: 16),
           Text('Historial de Rutas'),
           SizedBox(height: 8),
@@ -399,17 +374,17 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
   IconData _getRouteTypeIcon(RouteType type) {
     switch (type) {
       case RouteType.fastest:
-        return Icons.speed;
+        return Icons.speed_rounded;
       case RouteType.shortest:
-        return Icons.straighten;
+        return Icons.straighten_rounded;
       case RouteType.safest:
-        return Icons.security;
+        return Icons.security_rounded;
       case RouteType.mostEconomical:
-        return Icons.savings;
+        return Icons.savings_rounded;
       case RouteType.balanced:
-        return Icons.balance;
+        return Icons.balance_rounded;
       case RouteType.custom:
-        return Icons.tune;
+        return Icons.tune_rounded;
     }
   }
 
@@ -474,14 +449,14 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
                                 Navigator.pop(context);
                                 _startNavigation(route);
                               },
-                              icon: const Icon(Icons.navigation),
+                              icon: const Icon(Icons.navigation_rounded),
                               label: const Text('Iniciar Navegación'),
                             ),
                           ),
                           const SizedBox(width: 8),
                           IconButton(
                             onPressed: () => _saveRoute(route),
-                            icon: const Icon(Icons.bookmark_border),
+                            icon: const Icon(Icons.bookmark_border_rounded),
                             tooltip: 'Guardar ruta',
                           ),
                         ],
@@ -542,14 +517,14 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
               children: [
                 Expanded(
                   child: _buildInfoItem(
-                    icon: Icons.access_time,
+                    icon: Icons.access_time_rounded,
                     label: 'Duración',
                     value: '${route.estimatedDurationMinutes} min',
                   ),
                 ),
                 Expanded(
                   child: _buildInfoItem(
-                    icon: Icons.straighten,
+                    icon: Icons.straighten_rounded,
                     label: 'Distancia',
                     value: '${route.distanceKm.toStringAsFixed(1)} km',
                   ),
@@ -561,14 +536,14 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
               children: [
                 Expanded(
                   child: _buildInfoItem(
-                    icon: Icons.security,
+                    icon: Icons.security_rounded,
                     label: 'Seguridad',
                     value: '${(route.safetyAnalysis.overallRiskScore * 10).toInt()}/10',
                   ),
                 ),
                 Expanded(
                   child: _buildInfoItem(
-                    icon: Icons.warning,
+                    icon: Icons.warning_rounded,
                     label: 'Alertas',
                     value: '${route.safetyAnalysis.currentAlerts.length}',
                   ),

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/unified_menu.dart';
+import '../../../../shared/widgets/unified_app_bar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/navigation_provider.dart';
 
@@ -453,13 +454,9 @@ class ProfilePage extends ConsumerWidget {
     final authNotifier = ref.read(authStateProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Perfil'),
-        centerTitle: true,
-        elevation: 2,
-        shadowColor: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
+      appBar: UnifiedAppBarFactory.profile(
         actions: [
-          IconButton(
+          CommonAppBarActions.logout(
             onPressed: () async {
               final shouldLogout = await showDialog<bool>(
                 context: context,
@@ -483,7 +480,7 @@ class ProfilePage extends ConsumerWidget {
                 await authNotifier.signOut();
               }
             },
-            icon: const Icon(Icons.logout),
+            tooltip: 'Cerrar sesión',
           ),
         ],
       ),
@@ -501,7 +498,7 @@ class ProfilePage extends ConsumerWidget {
                       radius: 50,
                       backgroundColor: theme.colorScheme.primary,
                       child: Icon(
-                        Icons.person,
+                        Icons.person_rounded,
                         size: 50,
                         color: theme.colorScheme.onPrimary,
                       ),
@@ -533,19 +530,19 @@ class ProfilePage extends ConsumerWidget {
               'Configuración',
               [
                 _buildMenuItem(
-                  icon: Icons.notifications_outlined,
+                  icon: Icons.notifications_rounded,
                   title: 'Notificaciones',
                   subtitle: 'Configura alertas y avisos',
                   onTap: () {},
                 ),
                 _buildMenuItem(
-                  icon: Icons.security_outlined,
+                  icon: Icons.security_rounded,
                   title: 'Seguridad',
                   subtitle: 'Privacidad y autenticación',
                   onTap: () {},
                 ),
                 _buildMenuItem(
-                  icon: Icons.map_outlined,
+                  icon: Icons.map_rounded,
                   title: 'Preferencias de Mapa',
                   subtitle: 'Capas y filtros predeterminados',
                   onTap: () {},
@@ -560,13 +557,13 @@ class ProfilePage extends ConsumerWidget {
               'Soporte',
               [
                 _buildMenuItem(
-                  icon: Icons.help_outline,
+                  icon: Icons.help_rounded,
                   title: 'Ayuda',
                   subtitle: 'Preguntas frecuentes',
                   onTap: () {},
                 ),
                 _buildMenuItem(
-                  icon: Icons.info_outline,
+                  icon: Icons.info_rounded,
                   title: 'Acerca de',
                   subtitle: 'Versión ${AppConstants.appVersion}',
                   onTap: () {},
@@ -612,7 +609,7 @@ class ProfilePage extends ConsumerWidget {
       leading: Icon(icon),
       title: Text(title),
       subtitle: Text(subtitle),
-      trailing: const Icon(Icons.chevron_right),
+      trailing: const Icon(Icons.chevron_right_rounded),
       onTap: onTap,
     );
   }

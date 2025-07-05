@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 import '../../../../shared/widgets/loading_widget.dart';
-import '../../../../shared/widgets/unified_menu.dart';
-import '../../../app/presentation/providers/navigation_provider.dart';
+import '../../../../shared/widgets/unified_app_bar.dart';
 import '../../domain/entities/statistics_entity.dart';
 import '../providers/statistics_provider.dart';
 import '../widgets/security_overview_card.dart';
@@ -50,32 +49,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
     final theme = Theme.of(context);
     
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.dashboard,
-                color: theme.colorScheme.onPrimaryContainer,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Text('Dashboard de Seguridad'),
-          ],
-        ),
-        centerTitle: true,
-        backgroundColor: theme.colorScheme.surface,
-        elevation: 2,
-        shadowColor: theme.colorScheme.shadow.withOpacity(0.1),
+      appBar: UnifiedAppBarFactory.dashboard(
         actions: [
           PopupMenuButton<StatisticsPeriod>(
-            icon: const Icon(Icons.date_range),
+            icon: const Icon(Icons.date_range_rounded),
             tooltip: 'Período de tiempo',
             onSelected: (period) {
               setState(() {
@@ -89,7 +66,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
                 child: Row(
                   children: [
                     Icon(
-                      _selectedPeriod == period ? Icons.check : Icons.calendar_today,
+                      _selectedPeriod == period ? Icons.check_circle_rounded : Icons.calendar_today_rounded,
                       size: 16,
                     ),
                     const SizedBox(width: 8),
@@ -99,41 +76,29 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
               ),
             ).toList(),
           ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
+          CommonAppBarActions.refresh(
             onPressed: _refreshData,
-            tooltip: 'Actualizar datos',
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert_rounded),
             onSelected: (value) => _handleMenuAction(value, context),
             itemBuilder: (context) => [
               PopupMenuItem(
-                value: 'toggle_user_data',
-                child: Row(
-                  children: [
-                    Icon(_showUserData ? Icons.person_off : Icons.person),
-                    const SizedBox(width: 8),
-                    Text(_showUserData ? 'Ocultar datos personales' : 'Mostrar datos personales'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
                 value: 'export',
                 child: Row(
                   children: [
-                    Icon(Icons.download),
-                    SizedBox(width: 8),
+                    const Icon(Icons.download_rounded, size: 16),
+                    const SizedBox(width: 8),
                     Text('Exportar datos'),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'settings',
                 child: Row(
                   children: [
-                    Icon(Icons.settings),
-                    SizedBox(width: 8),
+                    const Icon(Icons.settings_rounded, size: 16),
+                    const SizedBox(width: 8),
                     Text('Configuración'),
                   ],
                 ),
@@ -141,25 +106,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
             ],
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50),
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TabBar(
-              controller: _tabController,
-              labelColor: theme.colorScheme.primary,
-              unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
-              indicatorColor: theme.colorScheme.primary,
-              indicatorWeight: 3,
-              tabs: const [
-                Tab(text: 'Resumen', icon: Icon(Icons.dashboard, size: 16)),
-                Tab(text: 'Tendencias', icon: Icon(Icons.trending_up, size: 16)),
-                Tab(text: 'Regiones', icon: Icon(Icons.map, size: 16)),
-                Tab(text: 'Actividad', icon: Icon(Icons.person, size: 16)),
-              ],
-            ),
-          ),
-        ),
       ),
       body: dashboardState.when(
         initial: () => const Center(
@@ -168,6 +114,24 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
         loading: () => const Center(child: LoadingWidget()),
         loaded: (dashboard) => Column(
           children: [
+            // Tab bar
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TabBar(
+                controller: _tabController,
+                labelColor: theme.colorScheme.primary,
+                unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
+                indicatorColor: theme.colorScheme.primary,
+                indicatorWeight: 3,
+                tabs: const [
+                  Tab(text: 'Resumen', icon: Icon(Icons.dashboard, size: 16)),
+                  Tab(text: 'Tendencias', icon: Icon(Icons.trending_up, size: 16)),
+                  Tab(text: 'Regiones', icon: Icon(Icons.map, size: 16)),
+                  Tab(text: 'Actividad', icon: Icon(Icons.person, size: 16)),
+                ],
+              ),
+            ),
+            
             // Quick stats header
             Container(
               padding: const EdgeInsets.all(16),
@@ -448,11 +412,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
 
   void _handleMenuAction(String action, BuildContext context) {
     switch (action) {
-      case 'toggle_user_data':
-        setState(() {
-          _showUserData = !_showUserData;
-        });
-        break;
       case 'export':
         _showExportDialog(context);
         break;

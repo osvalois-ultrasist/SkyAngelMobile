@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../features/app/presentation/pages/app_page.dart';
+import '../../features/app/presentation/providers/navigation_provider.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     
     return Drawer(
@@ -61,7 +63,7 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               // Navigate to home tab
-              _navigateToTab(context, 0);
+              ref.read(navigationProvider.notifier).navigateToTab(0);
             },
           ),
           ListTile(
@@ -70,7 +72,7 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               // Navigate to map tab
-              _navigateToTab(context, 1);
+              ref.read(navigationProvider.notifier).navigateToTab(1);
             },
           ),
           ListTile(
@@ -79,7 +81,7 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               // Navigate to alerts tab
-              _navigateToTab(context, 2);
+              ref.read(navigationProvider.notifier).navigateToTab(2);
             },
           ),
           ListTile(
@@ -88,7 +90,7 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               // Navigate to routes tab
-              _navigateToTab(context, 3);
+              ref.read(navigationProvider.notifier).navigateToTab(3);
             },
           ),
           const Divider(),
@@ -138,13 +140,6 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  void _navigateToTab(BuildContext context, int tabIndex) {
-    // Find the AppPage in the widget tree and update its tab
-    final appPageState = context.findAncestorStateOfType<AppPageState>();
-    if (appPageState != null) {
-      appPageState.updateCurrentIndex(tabIndex);
-    }
-  }
 
   static void _showHelpDialog(BuildContext context) {
     showDialog(
