@@ -3,7 +3,38 @@ import 'package:flutter/services.dart';
 
 import '../../../../shared/design_system/design_tokens.dart';
 import '../../domain/entities/route_entity.dart';
-import '../../domain/repositories/routes_repository.dart';
+// import '../../domain/repositories/routes_repository.dart';
+
+// Temporary type definitions until proper implementation
+enum RouteType {
+  fastest,
+  shortest, 
+  safest,
+  mostEconomical,
+  balanced,
+  custom,
+}
+
+
+class RouteFilter {
+  final List<RouteType>? routeTypes;
+  final List<RouteRiskLevel>? riskLevels;
+  final int? maxDurationMinutes;
+  final double? maxDistanceKm;
+  final double? maxRiskScore;
+  final bool? includeAlternatives;
+  final bool? prioritizeSafety;
+
+  const RouteFilter({
+    this.routeTypes,
+    this.riskLevels,
+    this.maxDurationMinutes,
+    this.maxDistanceKm,
+    this.maxRiskScore,
+    this.includeAlternatives,
+    this.prioritizeSafety,
+  });
+}
 
 /// Bottom sheet para filtros de rutas siguiendo el patrón de mapas
 /// Permite filtrar por tipo de ruta, nivel de riesgo, duración, etc.
@@ -29,7 +60,7 @@ class _RouteFilterBottomSheetState extends State<RouteFilterBottomSheet>
 
   // Filter state
   Set<RouteType> _selectedRouteTypes = {};
-  Set<RiskLevelType> _selectedRiskLevels = {};
+  Set<RouteRiskLevel> _selectedRiskLevels = {};
   RangeValues _durationRange = const RangeValues(0, 120); // 0-120 minutes
   RangeValues _distanceRange = const RangeValues(0, 100); // 0-100 km
   double _maxRiskScore = 1.0;
@@ -281,7 +312,7 @@ class _RouteFilterBottomSheetState extends State<RouteFilterBottomSheet>
         Wrap(
           spacing: DesignTokens.spacing2,
           runSpacing: DesignTokens.spacing2,
-          children: RiskLevelType.values.map((level) {
+          children: RouteRiskLevel.values.map((level) {
             final isSelected = _selectedRiskLevels.contains(level);
             return FilterChip(
               label: Row(
@@ -583,37 +614,20 @@ extension RouteTypeExtension on RouteType {
   }
 }
 
-extension RiskLevelTypeExtension on RiskLevelType {
-  String get label {
-    switch (this) {
-      case RiskLevelType.veryLow:
-        return 'Muy Bajo';
-      case RiskLevelType.low:
-        return 'Bajo';
-      case RiskLevelType.medium:
-        return 'Medio';
-      case RiskLevelType.high:
-        return 'Alto';
-      case RiskLevelType.veryHigh:
-        return 'Muy Alto';
-      case RiskLevelType.extreme:
-        return 'Extremo';
-    }
-  }
-
+extension RouteRiskLevelFilterExtension on RouteRiskLevel {
   Color get color {
     switch (this) {
-      case RiskLevelType.veryLow:
+      case RouteRiskLevel.veryLow:
         return Colors.green[700]!;
-      case RiskLevelType.low:
+      case RouteRiskLevel.low:
         return Colors.green;
-      case RiskLevelType.medium:
+      case RouteRiskLevel.moderate:
         return Colors.yellow[700]!;
-      case RiskLevelType.high:
+      case RouteRiskLevel.high:
         return Colors.orange;
-      case RiskLevelType.veryHigh:
+      case RouteRiskLevel.veryHigh:
         return Colors.red;
-      case RiskLevelType.extreme:
+      case RouteRiskLevel.extreme:
         return Colors.red[900]!;
     }
   }

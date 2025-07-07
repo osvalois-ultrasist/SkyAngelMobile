@@ -3,9 +3,41 @@ import 'package:latlong2/latlong.dart';
 
 import '../../../../core/error/app_error.dart';
 import '../../domain/entities/route_entity.dart';
-import '../../domain/repositories/routes_repository.dart';
+// import '../../domain/repositories/routes_repository.dart';
 
-part 'routes_state.freezed.dart';
+// Temporary type definitions until proper implementation
+class RouteFilter {
+  final List<RouteType>? routeTypes;
+  final List<RouteRiskLevel>? riskLevels;
+  final int? maxDurationMinutes;
+  final double? maxDistanceKm;
+  final double? maxRiskScore;
+  final bool? includeAlternatives;
+  final bool? prioritizeSafety;
+
+  const RouteFilter({
+    this.routeTypes,
+    this.riskLevels,
+    this.maxDurationMinutes,
+    this.maxDistanceKm,
+    this.maxRiskScore,
+    this.includeAlternatives,
+    this.prioritizeSafety,
+  });
+}
+
+
+class NavigationInstruction {
+  final String instruction;
+  final double distanceMeters;
+  final Duration duration;
+  
+  const NavigationInstruction({
+    required this.instruction,
+    required this.distanceMeters,
+    required this.duration,
+  });
+}
 
 @freezed
 class RoutesState with _$RoutesState {
@@ -180,8 +212,8 @@ extension RoutesStateExtension on RoutesState {
     return grouped;
   }
   
-  Map<RiskLevelType, List<RouteEntity>> get routesByRiskLevel {
-    final Map<RiskLevelType, List<RouteEntity>> grouped = {};
+  Map<RouteRiskLevel, List<RouteEntity>> get routesByRiskLevel {
+    final Map<RouteRiskLevel, List<RouteEntity>> grouped = {};
     
     for (final route in routes) {
       grouped.putIfAbsent(route.safetyAnalysis.riskLevel, () => []).add(route);

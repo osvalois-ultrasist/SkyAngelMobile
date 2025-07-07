@@ -8,7 +8,7 @@ import '../../../../shared/widgets/header_bar.dart';
 import '../../../../shared/design_system/design_tokens.dart';
 import '../../domain/entities/route_entity.dart';
 import '../providers/routes_provider.dart';
-import '../providers/routes_state.dart';
+// import '../providers/routes_state.dart';
 import '../widgets/route_search_widget.dart';
 import '../widgets/route_list_widget.dart';
 import '../widgets/route_map_widget.dart';
@@ -45,7 +45,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
   LatLng? _origin;
   LatLng? _destination;
   bool _isSearching = false;
-  RouteFilter? _activeRouteFilter;
+  // RouteFilter? _activeRouteFilter;
 
   @override
   void initState() {
@@ -140,8 +140,16 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
     final routeState = ref.watch(routeCalculationNotifierProvider);
     final savedRoutesState = ref.watch(savedRoutesNotifierProvider);
     
-    return Scaffold(
-      appBar: HeaderBarFactory.routes(
+    return AnimatedBuilder(
+      animation: _entryAnimationController,
+      builder: (context, child) {
+        return FadeTransition(
+          opacity: _fadeAnimation,
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: Scaffold(
+              backgroundColor: colorScheme.surface,
+              appBar: HeaderBarFactory.routes(
         subtitle: 'Encuentra la ruta más segura a tu destino',
         actions: [
           HeaderActions.viewMode(() {
@@ -153,13 +161,16 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
             // TODO: Show route type filter
           }),
           HeaderActions.refresh(() {
+            HapticFeedback.lightImpact();
             if (_origin != null && _destination != null) {
               _searchRoutes();
+            } else {
+              _refreshData();
             }
           }),
-          HeaderActions.more(() {
-            // TODO: Show more options
-          }),
+          // HeaderActions.more(() {
+          //   // TODO: Show more options
+          // }),
         ],
       ),
       body: Column(
@@ -212,13 +223,29 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
           ),
         ],
       ),
-      floatingActionButton: _origin != null && _destination != null
-          ? FloatingActionButton.extended(
-              onPressed: () => _showRouteOptionsDialog(context),
-              icon: const Icon(Icons.navigation_rounded),
-              label: const Text('Comenzar'),
+      floatingActionButton: _isRoutesReady && _origin != null && _destination != null
+          ? AnimatedBuilder(
+              animation: _fabAnimationController,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _fabAnimation.value,
+                  child: FloatingActionButton.extended(
+                    onPressed: () => _showRouteOptionsDialog(context),
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    elevation: DesignTokens.elevationL,
+                    icon: const Icon(Icons.navigation_rounded),
+                    label: const Text('Comenzar'),
+                  ),
+                );
+              },
             )
           : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+            ),
+          ),
+        );
+      },
     );
   }
 
