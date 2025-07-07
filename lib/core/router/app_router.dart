@@ -9,6 +9,7 @@ import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/alertas/presentation/pages/alerts_page.dart';
 import '../../features/alertas/presentation/pages/create_alert_page.dart';
+import '../../features/alertas/presentation/pages/alert_detail_page.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -77,14 +78,12 @@ class AppRouter {
             path: 'account',
             name: 'account',
             pageBuilder: (context, state) => MaterialPage(
-              child: AuthAwareWidget(
-                child: Scaffold(
-                  appBar: AppBar(
-                    title: const Text('Mi Cuenta'),
-                  ),
-                  body: const Center(
-                    child: Text('Página de cuenta de usuario'),
-                  ),
+              child: Scaffold(
+                appBar: AppBar(
+                  title: const Text('Mi Cuenta'),
+                ),
+                body: const Center(
+                  child: Text('Página de cuenta de usuario'),
                 ),
               ),
             ),
@@ -129,30 +128,8 @@ class AppRouter {
                     );
                   }
                   
-                  // TODO: Implement AlertDetailPage
                   return MaterialPage(
-                    child: Scaffold(
-                      appBar: AppBar(
-                        title: Text('Alerta #$alertId'),
-                      ),
-                      body: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.info, size: 64, color: Colors.blue),
-                            const SizedBox(height: 16),
-                            Text('Detalle de alerta #$alertId'),
-                            const SizedBox(height: 8),
-                            const Text('Página en desarrollo'),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () => context.go('/sky/alerts'),
-                              child: const Text('Volver a alertas'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                    child: AlertDetailPage(alertId: alertId),
                   );
                 },
               ),

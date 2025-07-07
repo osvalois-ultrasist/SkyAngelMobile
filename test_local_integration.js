@@ -79,7 +79,7 @@ async function testLocalIntegration() {
   try {
     const response = await axios.post(`${BASE_URL}/login_user`, {
       usuario: 'usuario1',
-      password: 'Password1!'
+      password:
     });
     console.log('✅ Login successful');
     console.log(`   Token: ${response.data.token.substring(0, 20)}...`);

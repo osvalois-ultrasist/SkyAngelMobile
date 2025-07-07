@@ -21,14 +21,14 @@ import '../widgets/risk_legend_widget.dart';
 
 /// Página de mapas refinada y homologada con el marco de diseño
 /// Optimizada para transportistas con diseño consistente con login/loading
-class MapsPage extends ConsumerStatefulWidget {
-  const MapsPage({super.key});
+class RefinedMapsPage extends ConsumerStatefulWidget {
+  const RefinedMapsPage({super.key});
 
   @override
-  ConsumerState<MapsPage> createState() => _MapsPageState();
+  ConsumerState<RefinedMapsPage> createState() => _RefinedMapsPageState();
 }
 
-class _MapsPageState extends ConsumerState<MapsPage>
+class _RefinedMapsPageState extends ConsumerState<RefinedMapsPage>
     with TickerProviderStateMixin {
   late TabController _tabController;
   late AnimationController _entryAnimationController;
@@ -164,7 +164,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
             opacity: _fadeAnimation,
             child: SlideTransition(
               position: _slideAnimation,
-              child: _buildMapContent(mapsState, highRiskPolygons, activePOIs, colorScheme, theme),
+              child: _buildMapContent(mapsState, highRiskPolygons, activePOIs, colorScheme),
             ),
           );
         },
@@ -191,25 +191,24 @@ class _MapsPageState extends ConsumerState<MapsPage>
 
   Widget _buildMapContent(
     MapsState mapsState,
-    List<RiskPolygon> highRiskPolygons,
-    List<POIEntity> activePOIs,
+    AsyncValue<List<RiskPolygon>> highRiskPolygons,
+    AsyncValue<List<POIEntity>> activePOIs,
     ColorScheme colorScheme,
-    ThemeData theme,
   ) {
     return Column(
       children: [
         // Barra de información rápida
-        _buildQuickInfoBar(colorScheme, theme),
+        _buildQuickInfoBar(colorScheme),
         
         // Indicadores de estado
-        _buildStatusIndicators(mapsState, colorScheme, theme),
+        _buildStatusIndicators(mapsState, colorScheme),
         
         // Contenido principal del mapa
         Expanded(
           child: Stack(
             children: [
               // Widget del mapa con loading
-              _buildMapWithLoading(mapsState, highRiskPolygons, activePOIs, theme),
+              _buildMapWithLoading(mapsState, highRiskPolygons, activePOIs),
               
               // Controles flotantes
               _buildFloatingControls(colorScheme),
@@ -224,7 +223,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
     );
   }
 
-  Widget _buildQuickInfoBar(ColorScheme colorScheme, ThemeData theme) {
+  Widget _buildQuickInfoBar(ColorScheme colorScheme) {
     return Container(
       margin: DesignTokens.spacingM,
       padding: DesignTokens.spacingL,
@@ -304,7 +303,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
     );
   }
 
-  Widget _buildStatusIndicators(MapsState mapsState, ColorScheme colorScheme, ThemeData theme) {
+  Widget _buildStatusIndicators(MapsState mapsState, ColorScheme colorScheme) {
     return Container(
       margin: DesignTokens.paddingHorizontalL,
       child: Row(
@@ -316,7 +315,6 @@ class _MapsPageState extends ConsumerState<MapsPage>
               Icons.verified_rounded,
               Colors.green,
               colorScheme,
-              theme,
             ),
           ),
           SizedBox(width: DesignTokens.spacing2),
@@ -327,7 +325,6 @@ class _MapsPageState extends ConsumerState<MapsPage>
               Icons.warning_rounded,
               Colors.orange,
               colorScheme,
-              theme,
             ),
           ),
           SizedBox(width: DesignTokens.spacing2),
@@ -338,7 +335,6 @@ class _MapsPageState extends ConsumerState<MapsPage>
               Icons.signal_cellular_4_bar_rounded,
               Colors.blue,
               colorScheme,
-              theme,
             ),
           ),
         ],
@@ -352,7 +348,6 @@ class _MapsPageState extends ConsumerState<MapsPage>
     IconData icon,
     Color color,
     ColorScheme colorScheme,
-    ThemeData theme,
   ) {
     return AnimatedBuilder(
       animation: _cardAnimationController,
@@ -408,9 +403,8 @@ class _MapsPageState extends ConsumerState<MapsPage>
 
   Widget _buildMapWithLoading(
     MapsState mapsState,
-    List<RiskPolygon> highRiskPolygons,
-    List<POIEntity> activePOIs,
-    ThemeData theme,
+    AsyncValue<List<RiskPolygon>> highRiskPolygons,
+    AsyncValue<List<POIEntity>> activePOIs,
   ) {
     return Container(
       margin: DesignTokens.spacingM,
@@ -435,8 +429,8 @@ class _MapsPageState extends ConsumerState<MapsPage>
                 child: MapWidget(
                   mapController: _mapController,
                   center: const LatLng(19.4326, -99.1332), // Ciudad de México
-                  riskPolygons: highRiskPolygons,
-                  pois: activePOIs,
+                  riskPolygons: highRiskPolygons.value ?? [],
+                  pois: activePOIs.value ?? [],
                   onMapTap: _onMapTap,
                   onPolygonTap: _onPolygonTap,
                   onPOITap: _onPOITap,
@@ -597,13 +591,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
             bottomRight: Radius.zero,
           ),
         ),
-        child: POIFilterBottomSheet(
-          currentFilter: _activePOIFilter,
-          onApplyFilter: (filter) {
-            setState(() => _activePOIFilter = filter);
-            Navigator.of(context).pop();
-          },
-        ),
+        child: const POIFilterBottomSheet(),
       ),
     );
   }
@@ -613,7 +601,7 @@ class _MapsPageState extends ConsumerState<MapsPage>
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Zona de Riesgo ${polygon.riskLevel.name.toUpperCase()}'),
-        content: const Text('Información detallada de la zona de riesgo.'),
+        content: Text('Información detallada de la zona de riesgo.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

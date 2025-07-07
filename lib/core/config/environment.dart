@@ -5,13 +5,14 @@ enum Environment {
 }
 
 class EnvironmentConfig {
-  static const Environment _environment = Environment.development;
+  static const Environment _environment = Environment.production;
   
   static Environment get environment => _environment;
   
   static String get baseUrl {
     switch (_environment) {
       case Environment.development:
+        return 'http://localhost:3001';
       case Environment.staging:
       case Environment.production:
         return 'http://skyangel-mock-prod.eba-mtya3rnt.us-east-1.elasticbeanstalk.com';
@@ -21,6 +22,7 @@ class EnvironmentConfig {
   static String get wsUrl {
     switch (_environment) {
       case Environment.development:
+        return 'ws://localhost:3001';
       case Environment.staging:
       case Environment.production:
         return 'ws://skyangel-mock-prod.eba-mtya3rnt.us-east-1.elasticbeanstalk.com';
@@ -29,7 +31,7 @@ class EnvironmentConfig {
   
   static String get apiVersion => ''; // Sin prefijo de versión
   
-  static String get fullApiUrl => '$baseUrl$apiVersion';
+  static String get fullApiUrl => '$baseUrl/api$apiVersion';
   
   static bool get isProduction => _environment == Environment.production;
   

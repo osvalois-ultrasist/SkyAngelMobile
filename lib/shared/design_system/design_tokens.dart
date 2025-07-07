@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Design Tokens para el sistema de diseño unificado de SkyAngel
 /// Basado en Material Design 3 y mejores prácticas de UX/UI
@@ -14,6 +15,15 @@ class DesignTokens {
   static const EdgeInsets spacingXL = EdgeInsets.all(20.0);
   static const EdgeInsets spacingXXL = EdgeInsets.all(24.0);
   static const EdgeInsets spacingXXXL = EdgeInsets.all(32.0);
+
+  // SIMPLE SPACING VALUES
+  static const double spacing1 = 4.0;
+  static const double spacing2 = 8.0;
+  static const double spacing3 = 12.0;
+  static const double spacing4 = 16.0;
+  static const double spacing5 = 20.0;
+  static const double spacing6 = 24.0;
+  static const double spacing8 = 32.0;
 
   // PADDING VERTICAL TOKENS
   static const EdgeInsets paddingVerticalXS = EdgeInsets.symmetric(vertical: 2.0);
@@ -186,10 +196,122 @@ class AppBarTokens {
       case AppBarType.tertiary:
         return theme.colorScheme.tertiary;
       case AppBarType.error:
+      case AppBarType.danger:
         return theme.colorScheme.error;
       case AppBarType.surface:
         return theme.colorScheme.surfaceVariant;
+      case AppBarType.success:
+        return Colors.green;
+      case AppBarType.warning:
+        return Colors.orange;
     }
+  }
+
+  // APPBAR COLOR METHODS
+  static Color getBackgroundColor(BuildContext context, AppBarType type) {
+    final theme = Theme.of(context);
+    switch (type) {
+      case AppBarType.primary:
+      case AppBarType.secondary:
+      case AppBarType.tertiary:
+      case AppBarType.surface:
+        return theme.colorScheme.surface;
+      case AppBarType.error:
+      case AppBarType.danger:
+        return theme.colorScheme.errorContainer;
+      case AppBarType.success:
+        return Colors.green.withOpacity(0.1);
+      case AppBarType.warning:
+        return Colors.orange.withOpacity(0.1);
+    }
+  }
+
+  static Color getForegroundColor(BuildContext context, AppBarType type) {
+    final theme = Theme.of(context);
+    switch (type) {
+      case AppBarType.primary:
+      case AppBarType.secondary:
+      case AppBarType.tertiary:
+      case AppBarType.surface:
+        return theme.colorScheme.onSurface;
+      case AppBarType.error:
+      case AppBarType.danger:
+        return theme.colorScheme.onErrorContainer;
+      case AppBarType.success:
+        return Colors.green.shade800;
+      case AppBarType.warning:
+        return Colors.orange.shade800;
+    }
+  }
+
+  static Color getSurfaceTintColor(BuildContext context, AppBarType type) {
+    final theme = Theme.of(context);
+    return theme.colorScheme.surfaceTint;
+  }
+
+  static Color getShadowColor(BuildContext context, AppBarType type) {
+    final theme = Theme.of(context);
+    return theme.shadowColor;
+  }
+
+  // APPBAR STYLE METHODS
+  static double getElevation(AppBarType type) {
+    return appBarElevation;
+  }
+
+  static double getScrolledUnderElevation(AppBarType type) {
+    return appBarElevation * 2;
+  }
+
+  static double getIconSize(AppBarType type) {
+    return iconSize;
+  }
+
+  static double getTitleSpacing(AppBarType type) {
+    return titleSpacing;
+  }
+
+  static TextStyle? getTitleTextStyle(BuildContext context, AppBarType type) {
+    final theme = Theme.of(context);
+    return theme.textTheme.titleLarge?.copyWith(
+      fontSize: titleFontSize,
+      fontWeight: titleFontWeight,
+      letterSpacing: titleLetterSpacing,
+      color: getForegroundColor(context, type),
+    );
+  }
+
+  static TextStyle? getToolbarTextStyle(BuildContext context, AppBarType type) {
+    final theme = Theme.of(context);
+    return theme.textTheme.bodyLarge?.copyWith(
+      color: getForegroundColor(context, type),
+    );
+  }
+
+  static ShapeBorder? getShape(AppBarType type) {
+    return null; // Default shape
+  }
+
+  static SystemUiOverlayStyle getSystemOverlayStyle(BuildContext context, AppBarType type) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
+    return SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      systemNavigationBarColor: theme.scaffoldBackgroundColor,
+      systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+    );
+  }
+
+  static ButtonStyle getIconButtonStyle(BuildContext context, AppBarType type) {
+    final theme = Theme.of(context);
+    return IconButton.styleFrom(
+      foregroundColor: getForegroundColor(context, type),
+      backgroundColor: Colors.transparent,
+      padding: const EdgeInsets.all(8),
+    );
   }
 }
 
@@ -200,4 +322,7 @@ enum AppBarType {
   tertiary,   // Para páginas de acción como Routes
   error,      // Para páginas de alertas
   surface,    // Para páginas neutrales
+  danger,     // Para alertas peligrosas
+  success,    // Para confirmaciones
+  warning,    // Para advertencias
 }

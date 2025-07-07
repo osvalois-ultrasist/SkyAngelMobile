@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+import '../../../../shared/design_system/design_tokens.dart';
 import '../../../../shared/widgets/loading_widget.dart';
-import '../../../../shared/widgets/unified_app_bar.dart';
+import '../../../../shared/widgets/header_bar.dart';
 import '../../domain/entities/statistics_entity.dart';
 import '../providers/statistics_provider.dart';
 import '../widgets/security_overview_card.dart';
@@ -23,6 +25,14 @@ class DashboardPage extends ConsumerStatefulWidget {
 class _DashboardPageState extends ConsumerState<DashboardPage>
     with TickerProviderStateMixin {
   late TabController _tabController;
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  late AnimationController _infoBarController;
+  late Animation<double> _infoBarAnimation;
+  late AnimationController _cardAnimationController;
+  
   StatisticsPeriod _selectedPeriod = StatisticsPeriod.monthly;
   bool _showUserData = true;
 
@@ -31,15 +41,74 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     
+    // Initialize animations
+    _fadeController = AnimationController(
+      duration: DesignTokens.animationDurationSlow,
+      vsync: this,
+    );
+    
+    _slideController = AnimationController(
+      duration: DesignTokens.animationDurationNormal,
+      vsync: this,
+    );
+    
+    _infoBarController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    
+    _cardAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOut,
+    ));
+    
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+    
+    _infoBarAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _infoBarController,
+      curve: Curves.easeOutBack,
+    ));
+    
     // Load dashboard data when page initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(dashboardStatisticsNotifierProvider.notifier).loadDashboard();
+      _fadeController.forward();
+      _slideController.forward();
+      
+      // Delayed animation for info bar
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) {
+          _infoBarController.forward();
+          _cardAnimationController.forward();
+        }
+      });
     });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _fadeController.dispose();
+    _slideController.dispose();
+    _infoBarController.dispose();
+    _cardAnimationController.dispose();
     super.dispose();
   }
 
@@ -47,190 +116,576 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
   Widget build(BuildContext context) {
     final dashboardState = ref.watch(dashboardStatisticsNotifierProvider);
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     
     return Scaffold(
-      appBar: UnifiedAppBarFactory.dashboard(
+      backgroundColor: colorScheme.surface,
+      appBar: HeaderBarFactory.dashboard(
+        subtitle: 'Análisis de seguridad integral',
         actions: [
-          PopupMenuButton<StatisticsPeriod>(
-            icon: const Icon(Icons.date_range_rounded),
-            tooltip: 'Período de tiempo',
-            onSelected: (period) {
-              setState(() {
-                _selectedPeriod = period;
-              });
-              _refreshData();
-            },
-            itemBuilder: (context) => StatisticsPeriod.values.map((period) =>
-              PopupMenuItem(
-                value: period,
-                child: Row(
-                  children: [
-                    Icon(
-                      _selectedPeriod == period ? Icons.check_circle_rounded : Icons.calendar_today_rounded,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(period.label),
-                  ],
-                ),
-              ),
-            ).toList(),
-          ),
-          CommonAppBarActions.refresh(
-            onPressed: _refreshData,
-          ),
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert_rounded),
-            onSelected: (value) => _handleMenuAction(value, context),
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'export',
-                child: Row(
-                  children: [
-                    const Icon(Icons.download_rounded, size: 16),
-                    const SizedBox(width: 8),
-                    Text('Exportar datos'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'settings',
-                child: Row(
-                  children: [
-                    const Icon(Icons.settings_rounded, size: 16),
-                    const SizedBox(width: 8),
-                    Text('Configuración'),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          HeaderActions.filter(() => _showPeriodFilter(context)),
+          HeaderActions.refresh(() {
+            HapticFeedback.lightImpact();
+            _refreshData();
+          }),
         ],
+        notification: _buildHeaderNotification(),
       ),
-      body: dashboardState.when(
-        initial: () => const Center(
-          child: Text('Cargando dashboard...'),
-        ),
-        loading: () => const Center(child: LoadingWidget()),
-        loaded: (dashboard) => Column(
-          children: [
-            // Tab bar
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: TabBar(
-                controller: _tabController,
-                labelColor: theme.colorScheme.primary,
-                unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
-                indicatorColor: theme.colorScheme.primary,
-                indicatorWeight: 3,
-                tabs: const [
-                  Tab(text: 'Resumen', icon: Icon(Icons.dashboard, size: 16)),
-                  Tab(text: 'Tendencias', icon: Icon(Icons.trending_up, size: 16)),
-                  Tab(text: 'Regiones', icon: Icon(Icons.map, size: 16)),
-                  Tab(text: 'Actividad', icon: Icon(Icons.person, size: 16)),
-                ],
-              ),
-            ),
-            
-            // Quick stats header
-            Container(
-              padding: const EdgeInsets.all(16),
-              child: _buildQuickStats(dashboard.securityOverview, theme),
-            ),
-            
-            // Main content
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildOverviewTab(dashboard),
-                  _buildTrendsTab(dashboard),
-                  _buildRegionsTab(dashboard),
-                  _buildActivityTab(dashboard),
-                ],
-              ),
-            ),
-          ],
-        ),
-        error: (error, message) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 64, color: Colors.red),
-              const SizedBox(height: 16),
-              Text(
-                'Error al cargar dashboard',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                message,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(dashboardStatisticsNotifierProvider.notifier).clearError();
-                  _refreshData();
-                },
-                child: const Text('Reintentar'),
-              ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              colorScheme.surface,
+              colorScheme.surface.withValues(alpha: 0.95),
             ],
           ),
+        ),
+        child: dashboardState.when(
+          initial: () => _buildLoadingState(),
+          loading: () => _buildLoadingState(),
+          loaded: (dashboard) => FadeTransition(
+            opacity: _fadeAnimation,
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: Column(
+                children: [
+                  //  Tab bar
+                  _buildTabBar(context, colorScheme),
+                  
+                  // Quick stats header with animation
+                  _buildAnimatedQuickStats(dashboard.securityOverview, theme),
+                  
+                  // Barra de información contextual del dashboard (inspirada en maps)
+                  AnimatedBuilder(
+                    animation: _infoBarAnimation,
+                    builder: (context, child) {
+                      return FadeTransition(
+                        opacity: _infoBarAnimation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(-0.3, 0),
+                            end: Offset.zero,
+                          ).animate(_infoBarController),
+                          child: _buildDashboardInfoBar(dashboard, colorScheme, theme),
+                        ),
+                      );
+                    },
+                  ),
+                  
+                  // Indicadores de estado del sistema (inspirado en maps)
+                  AnimatedBuilder(
+                    animation: _infoBarAnimation,
+                    builder: (context, child) {
+                      return FadeTransition(
+                        opacity: _infoBarAnimation,
+                        child: SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0.3, 0),
+                            end: Offset.zero,
+                          ).animate(_infoBarController),
+                          child: _buildSystemStatusIndicators(dashboard, colorScheme, theme),
+                        ),
+                      );
+                    },
+                  ),
+                  
+                  // Main content with enhanced styling
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildOverviewTab(dashboard),
+                        _buildTrendsTab(dashboard),
+                        _buildRegionsTab(dashboard),
+                        _buildActivityTab(dashboard),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          error: (error, message) => _buildErrorState(context, message),
         ),
       ),
     );
   }
 
-  Widget _buildQuickStats(SecurityOverview overview, ThemeData theme) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
+  //  Loading State
+  Widget _buildLoadingState() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Theme.of(context).colorScheme.surface,
+            Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
+          ],
+        ),
+      ),
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
-              child: _QuickStatItem(
-                icon: Icons.shield,
-                label: 'Nivel de Seguridad',
-                value: overview.currentSecurityLevel.label,
-                color: _getSecurityLevelColor(overview.currentSecurityLevel),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _QuickStatItem(
-                icon: Icons.warning,
-                label: 'Alertas Activas',
-                value: overview.activeAlerts.toString(),
-                color: overview.activeAlerts > 10 ? Colors.red : Colors.orange,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _QuickStatItem(
-                icon: Icons.trending_up,
-                label: 'Mejora',
-                value: '${overview.improvementPercentage.toStringAsFixed(1)}%',
-                color: overview.improvementPercentage >= 0 ? Colors.green : Colors.red,
+            LoadingWidget(),
+            SizedBox(height: DesignTokens.spacing4),
+            Text(
+              'Cargando análisis de seguridad...',
+              style: TextStyle(
+                fontSize: DesignTokens.fontSizeL,
+                fontWeight: DesignTokens.fontWeightMedium,
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  //  Error State
+  Widget _buildErrorState(BuildContext context, String message) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
+    return Center(
+      child: Container(
+        margin: DesignTokens.spacingXL,
+        padding: DesignTokens.spacingXL,
+        decoration: BoxDecoration(
+          color: colorScheme.errorContainer.withValues(alpha: 0.1),
+          borderRadius: DesignTokens.radiusL,
+          border: Border.all(
+            color: colorScheme.error.withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: DesignTokens.spacingL,
+              decoration: BoxDecoration(
+                color: colorScheme.error.withValues(alpha: 0.1),
+                borderRadius: DesignTokens.radiusFull,
+              ),
+              child: Icon(
+                Icons.analytics_outlined,
+                size: DesignTokens.iconSizeXXXL,
+                color: colorScheme.error,
+              ),
+            ),
+            const SizedBox(height: DesignTokens.spacing6),
+            Text(
+              'Error al cargar dashboard',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: colorScheme.error,
+                fontWeight: DesignTokens.fontWeightSemiBold,
+              ),
+            ),
+            const SizedBox(height: DesignTokens.spacing2),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+            const SizedBox(height: DesignTokens.spacing6),
+            ElevatedButton.icon(
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                ref.read(dashboardStatisticsNotifierProvider.notifier).clearError();
+                _refreshData();
+              },
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Reintentar'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+                padding: DesignTokens.spacingL,
+                shape: RoundedRectangleBorder(
+                  borderRadius: DesignTokens.radiusL,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  //  Tab Bar
+  Widget _buildTabBar(BuildContext context, ColorScheme colorScheme) {
+    return Container(
+      margin: DesignTokens.spacingL,
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: DesignTokens.radiusXL,
+        boxShadow: [
+          ShadowTokens.createShadow(
+            color: colorScheme.shadow,
+            opacity: DesignTokens.shadowOpacityLight,
+            blurRadius: DesignTokens.blurRadiusL,
+            offset: DesignTokens.shadowOffsetM,
+          ),
+        ],
+      ),
+      child: TabBar(
+        controller: _tabController,
+        labelColor: colorScheme.primary,
+        unselectedLabelColor: colorScheme.onSurfaceVariant,
+        indicator: BoxDecoration(
+          color: colorScheme.primaryContainer.withValues(alpha: 0.3),
+          borderRadius: DesignTokens.radiusL,
+        ),
+        indicatorPadding: const EdgeInsets.all(4),
+        labelStyle: const TextStyle(
+          fontSize: DesignTokens.fontSizeS,
+          fontWeight: DesignTokens.fontWeightSemiBold,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontSize: DesignTokens.fontSizeS,
+          fontWeight: DesignTokens.fontWeightMedium,
+        ),
+        tabs: const [
+          Tab(
+            text: 'Resumen',
+            icon: Icon(Icons.dashboard_rounded, size: DesignTokens.iconSizeS),
+          ),
+          Tab(
+            text: 'Tendencias',
+            icon: Icon(Icons.trending_up_rounded, size: DesignTokens.iconSizeS),
+          ),
+          Tab(
+            text: 'Regiones',
+            icon: Icon(Icons.map_rounded, size: DesignTokens.iconSizeS),
+          ),
+          Tab(
+            text: 'Actividad',
+            icon: Icon(Icons.person_rounded, size: DesignTokens.iconSizeS),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Barra de información contextual (inspirada en maps)
+  Widget _buildDashboardInfoBar(DashboardStatistics dashboard, ColorScheme colorScheme, ThemeData theme) {
+    final now = DateTime.now();
+    final lastUpdate = now.subtract(const Duration(minutes: 2));
+    final timeAgo = _formatTimeAgo(lastUpdate);
+    
+    return Container(
+      margin: DesignTokens.spacingM,
+      padding: DesignTokens.spacingL,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            colorScheme.primaryContainer.withOpacity(0.8),
+            colorScheme.primaryContainer.withOpacity(0.4),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: DesignTokens.radiusL,
+        border: Border.all(
+          color: colorScheme.primary.withOpacity(0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.primary.withOpacity(0.1),
+            blurRadius: DesignTokens.blurRadiusM,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: DesignTokens.spacingS,
+            decoration: BoxDecoration(
+              color: colorScheme.primary,
+              borderRadius: DesignTokens.radiusM,
+            ),
+            child: Icon(
+              Icons.analytics_rounded,
+              color: colorScheme.onPrimary,
+              size: DesignTokens.iconSizeL,
+            ),
+          ),
+          SizedBox(width: DesignTokens.spacing3),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Sistema de Análisis Operativo',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: DesignTokens.fontWeightSemiBold,
+                    color: colorScheme.onPrimaryContainer,
+                  ),
+                ),
+                Text(
+                  'Datos actualizados $timeAgo',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onPrimaryContainer.withOpacity(0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: DesignTokens.paddingHorizontalM.add(DesignTokens.paddingVerticalS),
+            decoration: BoxDecoration(
+              color: _getSystemStatusColor(dashboard.securityOverview.currentSecurityLevel).withOpacity(0.2),
+              borderRadius: DesignTokens.radiusM,
+            ),
+            child: Text(
+              _getSystemStatusText(dashboard.securityOverview.currentSecurityLevel),
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: _getSystemStatusColor(dashboard.securityOverview.currentSecurityLevel),
+                fontWeight: DesignTokens.fontWeightBold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Indicadores de estado del sistema (inspirado en maps)
+  Widget _buildSystemStatusIndicators(DashboardStatistics dashboard, ColorScheme colorScheme, ThemeData theme) {
+    return Container(
+      margin: DesignTokens.paddingHorizontalL,
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildSystemStatusCard(
+              'Estado General',
+              dashboard.securityOverview.currentSecurityLevel.label.toUpperCase(),
+              Icons.shield_rounded,
+              _getSystemStatusColor(dashboard.securityOverview.currentSecurityLevel),
+              colorScheme,
+              theme,
+            ),
+          ),
+          SizedBox(width: DesignTokens.spacing2),
+          Expanded(
+            child: _buildSystemStatusCard(
+              'Alertas Activas',
+              '${dashboard.securityOverview.activeAlerts}',
+              Icons.warning_rounded,
+              dashboard.securityOverview.activeAlerts > 10 ? Colors.red : Colors.orange,
+              colorScheme,
+              theme,
+            ),
+          ),
+          SizedBox(width: DesignTokens.spacing2),
+          Expanded(
+            child: _buildSystemStatusCard(
+              'Cobertura',
+              '${(dashboard.securityOverview.improvementPercentage + 85).toInt()}%',
+              Icons.signal_cellular_4_bar_rounded,
+              Colors.blue,
+              colorScheme,
+              theme,
+            ),
+          ),
+          SizedBox(width: DesignTokens.spacing2),
+          Expanded(
+            child: _buildSystemStatusCard(
+              'Tendencia',
+              dashboard.securityOverview.improvementPercentage >= 0 ? '↗' : '↘',
+              Icons.trending_up_rounded,
+              dashboard.securityOverview.improvementPercentage >= 0 ? Colors.green : Colors.red,
+              colorScheme,
+              theme,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSystemStatusCard(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+    ColorScheme colorScheme,
+    ThemeData theme,
+  ) {
+    return AnimatedBuilder(
+      animation: _cardAnimationController,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: 0.8 + (_cardAnimationController.value * 0.2),
+          child: Container(
+            padding: DesignTokens.spacingM,
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: DesignTokens.radiusM,
+              border: Border.all(
+                color: color.withOpacity(0.3),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.1),
+                  blurRadius: DesignTokens.blurRadiusS,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  icon,
+                  color: color,
+                  size: DesignTokens.iconSizeL,
+                ),
+                SizedBox(height: DesignTokens.spacing1),
+                Text(
+                  value,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: DesignTokens.fontWeightBold,
+                    color: color,
+                  ),
+                ),
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Métodos auxiliares para el estado del sistema
+  Color _getSystemStatusColor(SecurityLevel level) {
+    switch (level) {
+      case SecurityLevel.veryLow:
+      case SecurityLevel.low:
+        return Colors.green;
+      case SecurityLevel.moderate:
+        return Colors.orange;
+      case SecurityLevel.high:
+      case SecurityLevel.veryHigh:
+        return Colors.red;
+      case SecurityLevel.critical:
+        return Colors.red[900]!;
+    }
+  }
+
+  String _getSystemStatusText(SecurityLevel level) {
+    switch (level) {
+      case SecurityLevel.veryLow:
+      case SecurityLevel.low:
+        return 'ÓPTIMO';
+      case SecurityLevel.moderate:
+        return 'NORMAL';
+      case SecurityLevel.high:
+      case SecurityLevel.veryHigh:
+        return 'ALERTA';
+      case SecurityLevel.critical:
+        return 'CRÍTICO';
+    }
+  }
+
+  String _formatTimeAgo(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+    
+    if (difference.inMinutes < 60) {
+      return 'hace ${difference.inMinutes} min';
+    } else if (difference.inHours < 24) {
+      return 'hace ${difference.inHours}h';
+    } else {
+      return 'hace ${difference.inDays}d';
+    }
+  }
+
+  //  Quick Stats
+  Widget _buildAnimatedQuickStats(SecurityOverview overview, ThemeData theme) {
+    return Container(
+      margin: DesignTokens.spacingL,
+      padding: DesignTokens.spacingL,
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: DesignTokens.radiusL,
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.shadow.withOpacity(DesignTokens.shadowOpacityMedium),
+            blurRadius: DesignTokens.blurRadiusL,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _QuickStatItem(
+              icon: Icons.shield_rounded,
+              label: 'Nivel de Seguridad',
+              value: overview.currentSecurityLevel.label,
+              color: _getSecurityLevelColor(overview.currentSecurityLevel),
+              animationDelay: Duration.zero,
+            ),
+          ),
+          Container(
+            width: 1,
+            height: 40,
+            color: theme.colorScheme.outline.withValues(alpha: 0.3),
+          ),
+          Expanded(
+            child: _QuickStatItem(
+              icon: Icons.warning_amber_rounded,
+              label: 'Alertas Activas',
+              value: overview.activeAlerts.toString(),
+              color: overview.activeAlerts > 10 ? Colors.red : Colors.orange,
+              animationDelay: const Duration(milliseconds: 100),
+            ),
+          ),
+          Container(
+            width: 1,
+            height: 40,
+            color: theme.colorScheme.outline.withValues(alpha: 0.3),
+          ),
+          Expanded(
+            child: _QuickStatItem(
+              icon: Icons.trending_up_rounded,
+              label: 'Mejora',
+              value: '${overview.improvementPercentage.toStringAsFixed(1)}%',
+              color: overview.improvementPercentage >= 0 ? Colors.green : Colors.red,
+              animationDelay: const Duration(milliseconds: 200),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildOverviewTab(DashboardStatistics dashboard) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: DesignTokens.spacingL,
       child: Column(
         children: [
           SecurityOverviewCard(overview: dashboard.securityOverview),
-          const SizedBox(height: 16),
+          const SizedBox(height: DesignTokens.spacing4),
           CrimeStatisticsChart(crimeStats: dashboard.crimeStats),
-          const SizedBox(height: 16),
+          const SizedBox(height: DesignTokens.spacing4),
           RecommendationsWidget(recommendations: dashboard.recommendations),
+          const SizedBox(height: DesignTokens.spacing6), // Extra bottom padding
         ],
       ),
     );
@@ -238,7 +693,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
 
   Widget _buildTrendsTab(DashboardStatistics dashboard) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: DesignTokens.spacingL,
       child: Column(
         children: [
           TrendChartWidget(
@@ -511,51 +966,270 @@ class _DashboardPageState extends ConsumerState<DashboardPage>
       ),
     );
   }
+
+  HeaderNotification? _buildHeaderNotification() {
+    final dashboardState = ref.watch(dashboardStatisticsNotifierProvider);
+    return dashboardState.maybeWhen(
+      loaded: (dashboard) {
+        final criticalAlerts = dashboard.securityOverview.activeAlerts;
+        if (criticalAlerts > 0) {
+          return HeaderNotification(
+            icon: Icons.warning_rounded,
+            count: criticalAlerts,
+            color: criticalAlerts > 10 ? Colors.red : Colors.orange,
+            message: 'Alertas críticas activas',
+          );
+        }
+        return null;
+      },
+      orElse: () => null,
+    );
+  }
+
+  void _showPeriodFilter(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: DesignTokens.radiusXL.copyWith(
+            bottomLeft: Radius.zero,
+            bottomRight: Radius.zero,
+          ),
+        ),
+        padding: DesignTokens.spacingL,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: EdgeInsets.only(bottom: DesignTokens.spacing4),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: DesignTokens.radiusS,
+              ),
+            ),
+            Text(
+              'Período de análisis',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: DesignTokens.fontWeightSemiBold,
+              ),
+            ),
+            SizedBox(height: DesignTokens.spacing4),
+            ...StatisticsPeriod.values.map((period) => ListTile(
+              leading: Icon(
+                _selectedPeriod == period 
+                    ? Icons.radio_button_checked_rounded 
+                    : Icons.radio_button_unchecked_rounded,
+                color: _selectedPeriod == period 
+                    ? Theme.of(context).colorScheme.primary 
+                    : Colors.grey,
+              ),
+              title: Text(period.label),
+              onTap: () {
+                HapticFeedback.lightImpact();
+                setState(() => _selectedPeriod = period);
+                Navigator.pop(context);
+                _refreshData();
+              },
+            )),
+            SizedBox(height: DesignTokens.spacing6),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showMoreOptionsMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: DesignTokens.radiusXL.copyWith(
+            bottomLeft: Radius.zero,
+            bottomRight: Radius.zero,
+          ),
+        ),
+        padding: DesignTokens.spacingL,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: EdgeInsets.only(bottom: DesignTokens.spacing4),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: DesignTokens.radiusS,
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.download_rounded),
+              title: const Text('Exportar datos'),
+              onTap: () {
+                Navigator.pop(context);
+                _showExportDialog(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings_rounded),
+              title: const Text('Configuración'),
+              onTap: () {
+                Navigator.pop(context);
+                _showSettingsDialog(context);
+              },
+            ),
+            SizedBox(height: DesignTokens.spacing6),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _QuickStatItem extends StatelessWidget {
+/// Quick Stat Item with animations and improved design
+class _QuickStatItem extends StatefulWidget {
   final IconData icon;
   final String label;
   final String value;
   final Color color;
+  final Duration animationDelay;
 
   const _QuickStatItem({
     required this.icon,
     required this.label,
     required this.value,
     required this.color,
+    required this.animationDelay,
   });
 
   @override
+  State<_QuickStatItem> createState() => _QuickStatItemState();
+}
+
+class _QuickStatItemState extends State<_QuickStatItem>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _animationController = AnimationController(
+      duration: DesignTokens.animationDurationSlow,
+      vsync: this,
+    );
+    
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.elasticOut,
+    ));
+    
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,
+    ));
+    
+    // Start animation after delay
+    Future.delayed(widget.animationDelay, () {
+      if (mounted) {
+        _animationController.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
+    final theme = Theme.of(context);
+    
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return FadeTransition(
+          opacity: _fadeAnimation,
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: Padding(
+              padding: DesignTokens.spacingM,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  //  icon container
+                  Container(
+                    padding: DesignTokens.spacingS,
+                    decoration: BoxDecoration(
+                      color: widget.color.withValues(alpha: 0.15),
+                      borderRadius: DesignTokens.radiusM,
+                      boxShadow: [
+                        ShadowTokens.createShadow(
+                          color: widget.color,
+                          opacity: DesignTokens.shadowOpacityLight,
+                          blurRadius: DesignTokens.blurRadiusS,
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      widget.icon,
+                      color: widget.color,
+                      size: DesignTokens.iconSizeL,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: DesignTokens.spacing2),
+                  
+                  // Value with  styling
+                  Text(
+                    widget.value,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: DesignTokens.fontWeightBold,
+                      color: widget.color,
+                      fontSize: DesignTokens.fontSizeXL,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  
+                  const SizedBox(height: DesignTokens.spacing1),
+                  
+                  // Label with subtle styling
+                  Text(
+                    widget.label,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                      fontWeight: DesignTokens.fontWeightMedium,
+                      fontSize: DesignTokens.fontSizeXS,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
           ),
-          child: Icon(
-            icon,
-            color: color,
-            size: 24,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall,
-          textAlign: TextAlign.center,
-        ),
-      ],
+        );
+      },
     );
   }
 }
+

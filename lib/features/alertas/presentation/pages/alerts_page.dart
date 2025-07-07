@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../shared/widgets/loading_widget.dart';
-import '../../../../shared/widgets/unified_app_bar.dart';
+import '../../../../shared/widgets/header_bar.dart';
 import '../../domain/entities/alert_entity.dart';
 import '../providers/alert_provider.dart';
 import '../providers/alert_state.dart';
@@ -50,57 +50,17 @@ class _AlertsPageState extends ConsumerState<AlertsPage>
     final theme = Theme.of(context);
     
     return Scaffold(
-      appBar: UnifiedAppBarFactory.alerts(
+      appBar: HeaderBarFactory.alerts(
+        subtitle: 'Sistema de alertas de seguridad',
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            onPressed: () {
-              ref.read(alertNotifierProvider.notifier).loadActiveAlerts();
-              ref.read(alertStatisticsNotifierProvider.notifier).refresh();
-            },
-            tooltip: 'Actualizar alertas',
-          ),
-          IconButton(
-            icon: const Icon(Icons.filter_list_rounded),
-            onPressed: () => _showFilterBottomSheet(context),
-            tooltip: 'Filtrar alertas',
-          ),
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert_rounded),
-            onSelected: (value) => _handleMenuAction(value, context),
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'export',
-                child: Row(
-                  children: [
-                    Icon(Icons.download_rounded),
-                    SizedBox(width: 8),
-                    Text('Exportar datos'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'settings',
-                child: Row(
-                  children: [
-                    Icon(Icons.settings_rounded),
-                    SizedBox(width: 8),
-                    Text('Configuración'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'help',
-                child: Row(
-                  children: [
-                    Icon(Icons.help_outline_rounded),
-                    SizedBox(width: 8),
-                    Text('Ayuda'),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          HeaderActions.refresh(() {
+            ref.read(alertNotifierProvider.notifier).loadActiveAlerts();
+            ref.read(alertStatisticsNotifierProvider.notifier).refresh();
+          }),
+          HeaderActions.filter(() => _showFilterBottomSheet(context)),
+          HeaderActions.more(() {
+            // TODO: Show more options menu
+          }),
         ],
       ),
       body: Column(

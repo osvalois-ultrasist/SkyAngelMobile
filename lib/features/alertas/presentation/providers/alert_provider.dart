@@ -148,26 +148,7 @@ class AlertCategoriesNotifier extends _$AlertCategoriesNotifier {
   }
 }
 
-@riverpod
-class AlertSubcategoriesNotifier extends _$AlertSubcategoriesNotifier {
-  @override
-  AsyncValue<List<AlertSubcategoryEntity>> build(int? categoryId) {
-    loadSubcategories(categoryId);
-    return const AsyncValue.loading();
-  }
-
-  Future<void> loadSubcategories(int? categoryId) async {
-    state = const AsyncValue.loading();
-    
-    final useCase = getIt<GetAlertSubcategoriesUseCase>();
-    final result = await useCase(categoryId);
-    
-    result.fold(
-      (error) => state = AsyncValue.error(error, StackTrace.current),
-      (subcategories) => state = AsyncValue.data(subcategories),
-    );
-  }
-}
+// AlertSubcategoriesNotifier removed - feature not implemented yet
 
 @riverpod
 class AlertStatisticsNotifier extends _$AlertStatisticsNotifier {

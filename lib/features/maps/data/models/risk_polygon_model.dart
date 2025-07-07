@@ -77,6 +77,71 @@ class RiskPolygonModel {
       metadata: properties['metadata'] as Map<String, dynamic>?,
     );
   }
+
+  factory RiskPolygonModel.fromEntity(RiskPolygon entity) {
+    return RiskPolygonModel(
+      id: entity.id,
+      coordinates: entity.coordinates.map((coord) => [coord.latitude, coord.longitude]).toList(),
+      riskLevel: _riskLevelToString(entity.riskLevel),
+      riskValue: entity.riskValue,
+      dataSource: _dataSourceToString(entity.dataSource),
+      crimeTypes: entity.crimeTypes.map((type) => _crimeTypeToString(type)).toList(),
+      incidentCount: entity.incidentCount,
+      lastUpdate: entity.lastUpdate.toIso8601String(),
+      municipio: entity.municipio,
+      estado: entity.estado,
+      metadata: entity.metadata,
+    );
+  }
+
+  static String _riskLevelToString(RiskLevelType level) {
+    switch (level) {
+      case RiskLevelType.veryLow:
+        return 'very_low';
+      case RiskLevelType.low:
+        return 'low';
+      case RiskLevelType.moderate:
+        return 'moderate';
+      case RiskLevelType.high:
+        return 'high';
+      case RiskLevelType.veryHigh:
+        return 'very_high';
+      case RiskLevelType.extreme:
+        return 'extreme';
+    }
+  }
+
+  static String _dataSourceToString(DataSource source) {
+    switch (source) {
+      case DataSource.secretariado:
+        return 'secretariado';
+      case DataSource.anerpv:
+        return 'anerpv';
+      case DataSource.skyangel:
+        return 'skyangel';
+    }
+  }
+
+  static String _crimeTypeToString(CrimeType type) {
+    switch (type) {
+      case CrimeType.homicidio:
+        return 'homicidio';
+      case CrimeType.robo:
+        return 'robo';
+      case CrimeType.violacion:
+        return 'violacion';
+      case CrimeType.secuestro:
+        return 'secuestro';
+      case CrimeType.feminicidio:
+        return 'feminicidio';
+      case CrimeType.extorsion:
+        return 'extorsion';
+      case CrimeType.accidente:
+        return 'accidente';
+      case CrimeType.otro:
+        return 'otro';
+    }
+  }
 }
 
 extension RiskPolygonModelExtension on RiskPolygonModel {

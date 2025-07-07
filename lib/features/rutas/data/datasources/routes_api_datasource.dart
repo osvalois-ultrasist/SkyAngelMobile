@@ -8,7 +8,7 @@ import '../models/route_model.dart';
 
 part 'routes_api_datasource.g.dart';
 
-@RestApi()
+@RestApi(baseUrl: "")
 abstract class RoutesApiDataSource {
   factory RoutesApiDataSource(Dio dio) = _RoutesApiDataSource;
 

@@ -75,6 +75,73 @@ class POIModel {
       imageUrl: properties['image_url']?.toString(),
     );
   }
+
+  factory POIModel.fromEntity(POIEntity entity) {
+    return POIModel(
+      id: entity.id,
+      name: entity.name,
+      description: entity.description,
+      type: _poiTypeToString(entity.type),
+      lat: entity.coordinates.latitude,
+      lng: entity.coordinates.longitude,
+      status: _poiStatusToString(entity.status),
+      createdAt: entity.createdAt.toIso8601String(),
+      updatedAt: entity.updatedAt?.toIso8601String(),
+      address: entity.address,
+      phone: entity.phone,
+      website: entity.website,
+      metadata: entity.metadata,
+      rating: entity.rating,
+      tags: entity.tags,
+      imageUrl: entity.imageUrl,
+    );
+  }
+
+  static String _poiTypeToString(POIType type) {
+    switch (type) {
+      case POIType.accidenteTransito:
+        return 'accidente_transito';
+      case POIType.incidenciaFerroviaria:
+        return 'incidencia_ferroviaria';
+      case POIType.agenciaMinisterioPublico:
+        return 'agencia_ministerio_publico';
+      case POIType.guardiaNacional:
+        return 'guardia_nacional';
+      case POIType.caseta:
+        return 'caseta';
+      case POIType.corralon:
+        return 'corralon';
+      case POIType.paradero:
+        return 'paradero';
+      case POIType.pension:
+        return 'pension';
+      case POIType.coberturaCelular:
+        return 'cobertura_celular';
+      case POIType.hospital:
+        return 'hospital';
+      case POIType.gasolinera:
+        return 'gasolinera';
+      case POIType.banco:
+        return 'banco';
+      case POIType.policia:
+        return 'policia';
+      case POIType.otro:
+        return 'otro';
+    }
+  }
+
+  static String _poiStatusToString(POIStatus status) {
+    switch (status) {
+      case POIStatus.activo:
+        return 'activo';
+      case POIStatus.inactivo:
+        return 'inactivo';
+      case POIStatus.mantenimiento:
+        return 'mantenimiento';
+      case POIStatus.cerrado:
+        return 'cerrado';
+    }
+  }
 }
 
 extension POIModelExtension on POIModel {

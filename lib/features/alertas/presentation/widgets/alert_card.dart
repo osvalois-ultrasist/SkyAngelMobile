@@ -6,12 +6,14 @@ class AlertCard extends StatelessWidget {
   final AlertEntity alert;
   final VoidCallback? onTap;
   final Function(AlertStatus)? onStatusChanged;
+  final bool showFullContent;
 
   const AlertCard({
     super.key,
     required this.alert,
     this.onTap,
     this.onStatusChanged,
+    this.showFullContent = false,
   });
 
   @override

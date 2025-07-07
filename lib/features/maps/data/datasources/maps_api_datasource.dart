@@ -6,10 +6,12 @@ import '../../../../core/error/app_error.dart';
 import '../../../../core/utils/logger.dart';
 import '../models/risk_polygon_model.dart';
 import '../models/poi_model.dart';
+import '../fallback/mock_maps_data.dart';
+import '../../domain/entities/poi_entity.dart';
 
 part 'maps_api_datasource.g.dart';
 
-@RestApi()
+@RestApi(baseUrl: "")
 abstract class MapsApiDataSource {
   factory MapsApiDataSource(Dio dio) = _MapsApiDataSource;
 
@@ -27,7 +29,7 @@ abstract class MapsApiDataSource {
   @GET('/maps/estado')
   Future<dynamic> getStateBoundaries();
 
-  @GET('/points/punto_interes/{type}')
+  @GET('/puntos-interes/{type}')
   Future<dynamic> getPOIsByType(@Path() String type);
 
   @GET('/points/filtros')
@@ -45,6 +47,37 @@ class MapsApiDataSourceImpl {
   final MapsApiDataSource _apiService;
 
   MapsApiDataSourceImpl(this._apiService);
+
+  // Helper methods para fallback
+  Future<List<POIModel>> _loadMockPOIs(String type) async {
+    try {
+      AppLogger.info('Loading mock POIs for type $type as fallback');
+      
+      final mockPOIs = MockMapsData.getMockPOIsBySpecificType(type);
+      final poiModels = mockPOIs.map((poi) => POIModel.fromEntity(poi)).cast<POIModel>().toList();
+      
+      AppLogger.info('Loaded ${poiModels.length} mock POIs of type $type');
+      return poiModels;
+    } catch (e) {
+      AppLogger.error('Error loading mock POIs for type $type', error: e);
+      return [];
+    }
+  }
+
+  Future<List<RiskPolygonModel>> _loadMockRiskPolygons() async {
+    try {
+      AppLogger.info('Loading mock risk polygons as fallback');
+      
+      final mockPolygons = MockMapsData.getMockRiskPolygons();
+      final polygonModels = mockPolygons.map((polygon) => RiskPolygonModel.fromEntity(polygon)).cast<RiskPolygonModel>().toList();
+      
+      AppLogger.info('Loaded ${polygonModels.length} mock risk polygons');
+      return polygonModels;
+    } catch (e) {
+      AppLogger.error('Error loading mock risk polygons', error: e);
+      return [];
+    }
+  }
 
   @factoryMethod
   static MapsApiDataSourceImpl create(Dio dio) {
@@ -70,17 +103,15 @@ class MapsApiDataSourceImpl {
       
       return [];
     } on DioException catch (e) {
-      AppLogger.error('API error fetching risk polygons', error: e);
-      throw AppError.network(
-        message: 'Error de red al obtener polígonos de riesgo',
-        details: e.message ?? 'Error desconocido',
-      );
+      AppLogger.warning('API error fetching risk polygons: ${e.message}');
+      
+      // Fallback: usar datos mock
+      return _loadMockRiskPolygons();
     } catch (e) {
       AppLogger.error('Unexpected error fetching risk polygons', error: e);
-      throw AppError.unknown(
-        message: 'Error inesperado al obtener polígonos de riesgo',
-        details: e.toString(),
-      );
+      
+      // Fallback: usar datos mock
+      return _loadMockRiskPolygons();
     }
   }
 
@@ -133,17 +164,15 @@ class MapsApiDataSourceImpl {
       
       return [];
     } on DioException catch (e) {
-      AppLogger.error('API error fetching POIs', error: e);
-      throw AppError.network(
-        message: 'Error de red al obtener puntos de interés',
-        details: e.message ?? 'Error desconocido',
-      );
+      AppLogger.warning('API error fetching POIs for type $type: ${e.message}');
+      
+      // Fallback: usar datos mock si están disponibles
+      return _loadMockPOIs(type);
     } catch (e) {
-      AppLogger.error('Unexpected error fetching POIs', error: e);
-      throw AppError.unknown(
-        message: 'Error inesperado al obtener puntos de interés',
-        details: e.toString(),
-      );
+      AppLogger.error('Unexpected error fetching POIs for type $type', error: e);
+      
+      // Fallback: usar datos mock
+      return _loadMockPOIs(type);
     }
   }
 

@@ -10,7 +10,7 @@ import '../models/alert_statistics_model.dart';
 
 part 'alert_api_datasource.g.dart';
 
-@RestApi()
+@RestApi(baseUrl: "")
 abstract class AlertApiDataSource {
   factory AlertApiDataSource(Dio dio) = _AlertApiDataSource;
 
@@ -37,7 +37,7 @@ abstract class AlertApiDataSource {
     @Query('categoria_id') int? categoryId,
   });
   
-  @GET('/alerts/alertas/estadisticas')
+  @GET('/alerts/estadisticas')
   Future<dynamic> getStatistics();
 }
 

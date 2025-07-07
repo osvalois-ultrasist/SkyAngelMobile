@@ -9,19 +9,19 @@ class ApiEndpoints {
   
   // === AUTENTICACIÓN ===
   // Endpoints que coinciden con el contrato de la API mock
-  static String get login => '$baseUrl/api/auth/login';
-  static String get loginUser => '$baseUrl/api/auth/login_user';
-  static String get register => '$baseUrl/api/auth/registro_user';
-  static String get logout => '$baseUrl/api/auth/logout';
-  static String get refreshToken => '$baseUrl/api/auth/refresh';
-  static String get forgotPassword => '$baseUrl/api/auth/forgot-password';
-  static String get resetPassword => '$baseUrl/api/auth/reset-password';
-  static String get verifyEmail => '$baseUrl/api/auth/verify-email';
-  static String get changePassword => '$baseUrl/api/auth/change_password';
-  static String get validatePassword => '$baseUrl/api/auth/validate_password';
-  static String get validateEmail => '$baseUrl/api/auth/validar_correo';
-  static String get checkToken => '$baseUrl/api/auth/check_token';
-  static String get credenciales => '$baseUrl/api/auth/credenciales';
+  static String get login => '$baseUrl/auth/login';
+  static String get loginUser => '$baseUrl/auth/login_user';
+  static String get register => '$baseUrl/auth/registro_user';
+  static String get logout => '$baseUrl/auth/logout';
+  static String get refreshToken => '$baseUrl/auth/refresh';
+  static String get forgotPassword => '$baseUrl/auth/forgot-password';
+  static String get resetPassword => '$baseUrl/auth/reset-password';
+  static String get verifyEmail => '$baseUrl/auth/verify-email';
+  static String get changePassword => '$baseUrl/auth/change_password';
+  static String get validatePassword => '$baseUrl/auth/validate_password';
+  static String get validateEmail => '$baseUrl/auth/validar_correo';
+  static String get checkToken => '$baseUrl/auth/check_token';
+  static String get credenciales => '$baseUrl/auth/credenciales';
   
   // === DELITOS Y CRIMINALIDAD ===
   // Secretariado (Fuente oficial de datos de criminalidad)
