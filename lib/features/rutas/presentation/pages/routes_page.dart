@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../../shared/widgets/loading_widget.dart';
-import '../../../../shared/widgets/unified_app_bar.dart';
+import '../../../../shared/widgets/header_bar.dart';
+import '../../../../shared/design_system/design_tokens.dart';
 import '../../domain/entities/route_entity.dart';
 import '../providers/routes_provider.dart';
+import '../providers/routes_state.dart';
 import '../widgets/route_search_widget.dart';
 import '../widgets/route_list_widget.dart';
 import '../widgets/route_map_widget.dart';
 import '../widgets/route_options_widget.dart';
+import '../widgets/route_statistics_widget.dart';
+import '../widgets/route_filter_bottom_sheet.dart';
 
 class RoutesPage extends ConsumerStatefulWidget {
   const RoutesPage({super.key});
@@ -18,31 +23,114 @@ class RoutesPage extends ConsumerStatefulWidget {
   ConsumerState<RoutesPage> createState() => _RoutesPageState();
 }
 
+/// Página de rutas refinada y homologada con el marco de diseño
+/// Optimizada para transportistas con diseño consistente con mapas
 class _RoutesPageState extends ConsumerState<RoutesPage>
     with TickerProviderStateMixin {
+  late AnimationController _entryAnimationController;
+  late AnimationController _fabAnimationController;
+  late AnimationController _cardAnimationController;
   late TabController _tabController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _fabAnimation;
+  
   RouteType _selectedRouteType = RouteType.safest;
   bool _showMap = true;
+  bool _showRouteStatistics = false;
+  bool _isRoutesReady = false;
   
   // Search state
   LatLng? _origin;
   LatLng? _destination;
   bool _isSearching = false;
+  RouteFilter? _activeRouteFilter;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _initializeAnimations();
+    _loadRoutesData();
+  }
+
+  void _initializeAnimations() {
+    // Animación de entrada principal (similar al mapa)
+    _entryAnimationController = AnimationController(
+      duration: DesignTokens.animationDurationSlow,
+      vsync: this,
+    );
     
-    // Load saved routes when page initializes
+    // Animación del FAB
+    _fabAnimationController = AnimationController(
+      duration: DesignTokens.animationDurationNormal,
+      vsync: this,
+    );
+    
+    // Animación de las tarjetas
+    _cardAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _entryAnimationController,
+      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+    ));
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _entryAnimationController,
+      curve: const Interval(0.2, 0.8, curve: Curves.easeOutCubic),
+    ));
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _entryAnimationController,
+      curve: const Interval(0.4, 1.0, curve: Curves.elasticOut),
+    ));
+
+    _fabAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _fabAnimationController,
+      curve: Curves.elasticOut,
+    ));
+
+    // Iniciar animaciones
+    _entryAnimationController.forward();
+  }
+
+  void _loadRoutesData() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(savedRoutesNotifierProvider.notifier).loadSavedRoutes('current_user');
+      
+      // Simular carga de rutas y animar entrada
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          setState(() => _isRoutesReady = true);
+          _fabAnimationController.forward();
+          _cardAnimationController.forward();
+        }
+      });
     });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _entryAnimationController.dispose();
+    _fabAnimationController.dispose();
+    _cardAnimationController.dispose();
     super.dispose();
   }
 
@@ -53,56 +141,25 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
     final savedRoutesState = ref.watch(savedRoutesNotifierProvider);
     
     return Scaffold(
-      appBar: UnifiedAppBarFactory.routes(
+      appBar: HeaderBarFactory.routes(
+        subtitle: 'Encuentra la ruta más segura a tu destino',
         actions: [
-          IconButton(
-            icon: Icon(_showMap ? Icons.list_rounded : Icons.map_rounded),
-            onPressed: () {
-              setState(() {
-                _showMap = !_showMap;
-              });
-            },
-            tooltip: _showMap ? 'Ver lista' : 'Ver mapa',
-          ),
-          PopupMenuButton<RouteType>(
-            icon: const Icon(Icons.tune_rounded),
-            tooltip: 'Opciones de ruta',
-            onSelected: (routeType) {
-              setState(() {
-                _selectedRouteType = routeType;
-              });
-              if (_origin != null && _destination != null) {
-                _searchRoutes();
-              }
-            },
-            itemBuilder: (context) => RouteType.values.map((type) =>
-              PopupMenuItem(
-                value: type,
-                child: Row(
-                  children: [
-                    Icon(
-                      _getRouteTypeIcon(type),
-                      size: 16,
-                      color: _selectedRouteType == type ? theme.colorScheme.primary : null,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      type.label,
-                      style: TextStyle(
-                        color: _selectedRouteType == type ? theme.colorScheme.primary : null,
-                        fontWeight: _selectedRouteType == type ? FontWeight.bold : null,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ).toList(),
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            onPressed: _refreshData,
-            tooltip: 'Actualizar',
-          ),
+          HeaderActions.viewMode(() {
+            setState(() {
+              _showMap = !_showMap;
+            });
+          }),
+          HeaderActions.filter(() {
+            // TODO: Show route type filter
+          }),
+          HeaderActions.refresh(() {
+            if (_origin != null && _destination != null) {
+              _searchRoutes();
+            }
+          }),
+          HeaderActions.more(() {
+            // TODO: Show more options
+          }),
         ],
       ),
       body: Column(
