@@ -42,20 +42,12 @@ class MenuItem {
 class MenuConfig {
   static const List<MenuItem> bottomNavigationItems = [
     MenuItem(
-      id: 'dashboard',
-      title: 'Dashboard',
-      icon: Icons.dashboard_outlined,
-      activeIcon: Icons.dashboard,
-      requiredPermission: Permission.viewDashboard,
-      tabIndex: 0,
-    ),
-    MenuItem(
       id: 'maps',
       title: 'Mapa',
       icon: Icons.map_outlined,
       activeIcon: Icons.map,
       requiredPermission: Permission.viewMaps,
-      tabIndex: 1,
+      tabIndex: 0,
     ),
     MenuItem(
       id: 'alerts',
@@ -63,7 +55,7 @@ class MenuConfig {
       icon: Icons.warning_amber_outlined,
       activeIcon: Icons.warning_amber,
       requiredPermission: Permission.viewAlerts,
-      tabIndex: 2,
+      tabIndex: 1,
     ),
     MenuItem(
       id: 'routes',
@@ -71,6 +63,14 @@ class MenuConfig {
       icon: Icons.route_outlined,
       activeIcon: Icons.route,
       requiredPermission: Permission.viewRoutes,
+      tabIndex: 2,
+    ),
+    MenuItem(
+      id: 'copilot',
+      title: 'Copiloto',
+      icon: Icons.psychology_outlined,
+      activeIcon: Icons.psychology,
+      requiredPermission: Permission.aiCopilot,
       tabIndex: 3,
     ),
     MenuItem(
@@ -85,31 +85,31 @@ class MenuConfig {
 
   static const List<MenuItem> drawerMenuItems = [
     MenuItem(
-      id: 'dashboard_drawer',
-      title: 'Dashboard',
-      icon: Icons.dashboard,
-      requiredPermission: Permission.viewDashboard,
-      tabIndex: 0,
-    ),
-    MenuItem(
       id: 'maps_drawer',
       title: 'Mapa de Delitos',
       icon: Icons.map,
       requiredPermission: Permission.viewMaps,
-      tabIndex: 1,
+      tabIndex: 0,
     ),
     MenuItem(
       id: 'alerts_drawer',
       title: 'Alertas',
       icon: Icons.warning_amber,
       requiredPermission: Permission.viewAlerts,
-      tabIndex: 2,
+      tabIndex: 1,
     ),
     MenuItem(
       id: 'routes_drawer',
       title: 'Rutas Seguras',
       icon: Icons.route,
       requiredPermission: Permission.viewRoutes,
+      tabIndex: 2,
+    ),
+    MenuItem(
+      id: 'copilot_drawer',
+      title: 'Copiloto AI',
+      icon: Icons.psychology,
+      requiredPermission: Permission.aiCopilot,
       tabIndex: 3,
     ),
     MenuItem.divider(),

@@ -5,8 +5,8 @@ import '../../../../shared/models/menu_item.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../alertas/presentation/pages/alerts_page.dart';
 import '../../../maps/presentation/pages/maps_page.dart';
-import '../../../estadisticas/presentation/pages/dashboard_page.dart';
 import '../../../rutas/presentation/pages/routes_page.dart';
+import '../../../ai_assistant/presentation/pages/copilot_page.dart';
 import '../pages/app_page.dart';
 
 class NavigationState {
@@ -37,11 +37,11 @@ class NavigationNotifier extends StateNotifier<NavigationState> {
   final Ref ref;
   
   static const List<Widget> _allPages = [
-    DashboardPage(), // 0
-    MapsPage(),      // 1
-    AlertsPage(),    // 2
-    RoutesPage(),    // 3
-    ProfilePage(),   // 4
+    MapsPage(),                  // 0 - Maps
+    AlertsPage(),                // 1 - Alerts
+    RoutesPage(),                // 2 - Routes
+    CopilotPage(),               // 3 - Copilot
+    ProfilePage(),               // 4 - Profile
   ];
 
   NavigationNotifier(this.ref) : super(const NavigationState(

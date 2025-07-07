@@ -3,9 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../shared/widgets/unified_menu.dart';
-import '../../../../shared/widgets/unified_app_bar.dart';
+import '../../../../shared/widgets/app_navigation.dart';
+import '../../../../shared/widgets/app_scaffold.dart';
+import '../../../../shared/widgets/app_bar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../ai_assistant/domain/entities/ai_chat_session.dart';
+import '../../../ai_assistant/presentation/widgets/ai_floating_action_button.dart';
 import '../providers/navigation_provider.dart';
 
 class AppPage extends ConsumerStatefulWidget {
@@ -32,15 +35,64 @@ class AppPageState extends ConsumerState<AppPage> {
     final currentPage = ref.watch(currentPageProvider);
     final navigation = ref.watch(navigationProvider);
     
-    return Scaffold(
+    return AppScaffold(
       body: currentPage,
-      bottomNavigationBar: UnifiedBottomNavigation(
+      bottomNavigationBar: AppNavigation(
         currentIndex: navigation.currentIndex,
         onTap: (index) {
           ref.read(navigationProvider.notifier).setCurrentIndex(index);
         },
       ),
     );
+  }
+
+  AiChatContextType _getContextTypeForTab(int tabIndex) {
+    switch (tabIndex) {
+      case 0:
+        return AiChatContextType.maps;
+      case 1:
+        return AiChatContextType.alerts;
+      case 2:
+        return AiChatContextType.routes;
+      case 3:
+        return AiChatContextType.general; // Copilot tab
+      case 4:
+        return AiChatContextType.profile;
+      default:
+        return AiChatContextType.general;
+    }
+  }
+
+  Map<String, dynamic>? _getContextDataForTab(int tabIndex) {
+    switch (tabIndex) {
+      case 0:
+        return {
+          'page': 'maps',
+          'features': ['crime_mapping', 'risk_zones', 'geospatial_analysis'],
+        };
+      case 1:
+        return {
+          'page': 'alerts',
+          'features': ['community_alerts', 'emergency_notifications', 'safety_reports'],
+        };
+      case 2:
+        return {
+          'page': 'routes',
+          'features': ['safe_routing', 'route_optimization', 'traffic_analysis'],
+        };
+      case 3:
+        return {
+          'page': 'copilot',
+          'features': ['ai_assistance', 'smart_recommendations', 'contextual_help'],
+        };
+      case 4:
+        return {
+          'page': 'profile',
+          'features': ['user_settings', 'preferences', 'security_config'],
+        };
+      default:
+        return null;
+    }
   }
 }
 
@@ -51,22 +103,16 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('SkyAngel'),
-        centerTitle: true,
-        elevation: 2,
-        shadowColor: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
+      appBar: AppBarFactory.dashboard(
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
+          AppBarActions.search(
             onPressed: () {
               // TODO: Implement search functionality
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
+          AppBarActions.settings(
             onPressed: () {
-              // TODO: Implement notifications
+              // TODO: Show more options
             },
           ),
         ],
@@ -339,110 +385,10 @@ class _FeatureCard extends StatelessWidget {
   }
 }
 
-class MapPage extends StatelessWidget {
-  const MapPage({super.key});
+// MapPage is implemented in lib/features/maps/presentation/pages/maps_page.dart
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mapa de Delitos'),
-        centerTitle: true,
-        elevation: 2,
-        shadowColor: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.layers),
-            onPressed: () {
-              // TODO: Show map layers
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {
-              // TODO: Show filters
-            },
-          ),
-        ],
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.map,
-              size: 80,
-              color: Colors.green,
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Mapa de Delitos',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Aquí se mostrará el mapa interactivo\ncon datos de criminalidad',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class AlertsPlaceholderPage extends StatelessWidget {
-  const AlertsPlaceholderPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Alertas'),
-        centerTitle: true,
-        elevation: 2,
-        shadowColor: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.warning_amber,
-              size: 80,
-              color: Colors.orange,
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Alertas de Seguridad',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Recibe notificaciones en tiempo real\nsobre incidentes de seguridad',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
+// AlertsPage is implemented in lib/features/alertas/presentation/pages/alerts_page.dart
+// RoutesPage is implemented in lib/features/rutas/presentation/pages/routes_page.dart
 
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
@@ -454,9 +400,15 @@ class ProfilePage extends ConsumerWidget {
     final authNotifier = ref.read(authStateProvider.notifier);
 
     return Scaffold(
-      appBar: UnifiedAppBarFactory.profile(
+      appBar: AppBarFactory.profile(
         actions: [
-          CommonAppBarActions.logout(
+          AppBarActions.notifications(
+            onPressed: () {
+              // TODO: Show notifications dialog or navigate to notifications
+            },
+            badgeCount: 3,
+          ),
+          AppBarActions.logout(
             onPressed: () async {
               final shouldLogout = await showDialog<bool>(
                 context: context,
@@ -480,7 +432,6 @@ class ProfilePage extends ConsumerWidget {
                 await authNotifier.signOut();
               }
             },
-            tooltip: 'Cerrar sesión',
           ),
         ],
       ),

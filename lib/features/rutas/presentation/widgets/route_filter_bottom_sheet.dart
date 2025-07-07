@@ -5,15 +5,15 @@ import '../../../../shared/design_system/design_tokens.dart';
 import '../../domain/entities/route_entity.dart';
 // import '../../domain/repositories/routes_repository.dart';
 
-// Temporary type definitions until proper implementation
-enum RouteType {
-  fastest,
-  shortest, 
-  safest,
-  mostEconomical,
-  balanced,
-  custom,
-}
+// Remove this enum since it's already defined in route_entity.dart
+// enum RouteType {
+//   fastest,
+//   shortest, 
+//   safest,
+//   mostEconomical,
+//   balanced,
+//   custom,
+// }
 
 
 class RouteFilter {
@@ -594,25 +594,25 @@ class ShadowTokens {
   }
 }
 
-// Extensions para obtener colores y labels de enums
-extension RouteTypeExtension on RouteType {
-  String get label {
-    switch (this) {
-      case RouteType.fastest:
-        return 'Más Rápida';
-      case RouteType.shortest:
-        return 'Más Corta';
-      case RouteType.safest:
-        return 'Más Segura';
-      case RouteType.mostEconomical:
-        return 'Más Económica';
-      case RouteType.balanced:
-        return 'Balanceada';
-      case RouteType.custom:
-        return 'Personalizada';
-    }
-  }
-}
+// Remove this extension since it's already defined in route_entity.dart
+// extension RouteTypeExtension on RouteType {
+//   String get label {
+//     switch (this) {
+//       case RouteType.fastest:
+//         return 'Más Rápida';
+//       case RouteType.shortest:
+//         return 'Más Corta';
+//       case RouteType.safest:
+//         return 'Más Segura';
+//       case RouteType.mostEconomical:
+//         return 'Más Económica';
+//       case RouteType.balanced:
+//         return 'Balanceada';
+//       case RouteType.custom:
+//         return 'Personalizada';
+//     }
+//   }
+// }
 
 extension RouteRiskLevelFilterExtension on RouteRiskLevel {
   Color get color {

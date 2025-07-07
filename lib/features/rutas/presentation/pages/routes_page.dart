@@ -14,7 +14,7 @@ import '../widgets/route_list_widget.dart';
 import '../widgets/route_map_widget.dart';
 import '../widgets/route_options_widget.dart';
 import '../widgets/route_statistics_widget.dart';
-import '../widgets/route_filter_bottom_sheet.dart';
+import '../widgets/route_filter_bottom_sheet.dart' as filter_sheet;
 
 class RoutesPage extends ConsumerStatefulWidget {
   const RoutesPage({super.key});
@@ -148,7 +148,7 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
           child: SlideTransition(
             position: _slideAnimation,
             child: Scaffold(
-              backgroundColor: colorScheme.surface,
+              backgroundColor: theme.colorScheme.surface,
               appBar: HeaderBarFactory.routes(
         subtitle: 'Encuentra la ruta más segura a tu destino',
         actions: [
@@ -231,8 +231,8 @@ class _RoutesPageState extends ConsumerState<RoutesPage>
                   scale: _fabAnimation.value,
                   child: FloatingActionButton.extended(
                     onPressed: () => _showRouteOptionsDialog(context),
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: colorScheme.onPrimary,
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
                     elevation: DesignTokens.elevationL,
                     icon: const Icon(Icons.navigation_rounded),
                     label: const Text('Comenzar'),

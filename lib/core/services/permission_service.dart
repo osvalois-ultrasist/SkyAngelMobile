@@ -38,6 +38,7 @@ enum Permission {
   systemSettings,
   viewProfile,
   editProfile,
+  aiCopilot,
 }
 
 class PermissionService {
@@ -57,6 +58,7 @@ class PermissionService {
       Permission.systemSettings,
       Permission.viewProfile,
       Permission.editProfile,
+      Permission.aiCopilot,
     },
     UserRole.moderator: {
       Permission.viewDashboard,
@@ -70,6 +72,7 @@ class PermissionService {
       Permission.exportData,
       Permission.viewProfile,
       Permission.editProfile,
+      Permission.aiCopilot,
     },
     UserRole.user: {
       Permission.viewDashboard,
@@ -80,6 +83,7 @@ class PermissionService {
       Permission.createRoutes,
       Permission.viewProfile,
       Permission.editProfile,
+      Permission.aiCopilot,
     },
     UserRole.guest: {
       Permission.viewMaps,
